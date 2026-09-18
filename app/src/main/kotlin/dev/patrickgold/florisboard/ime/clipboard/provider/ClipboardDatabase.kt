@@ -170,6 +170,8 @@ data class ClipboardItem @OptIn(ExperimentalSerializationApi::class) constructor
                         ItemType.VIDEO -> ClipboardMediaProvider.VIDEO_CLIPS_URI
                     }, values)
                 }
+            } else { null }
+
             val html = dataItem.htmlText
             val text = if (!html.isNullOrBlank()) {
                 tryOrNull {

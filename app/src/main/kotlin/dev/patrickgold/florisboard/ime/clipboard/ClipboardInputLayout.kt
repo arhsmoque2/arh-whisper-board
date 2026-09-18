@@ -51,6 +51,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.automirrored.outlined.Backspace
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
@@ -214,6 +216,21 @@ fun ClipboardInputLayout(
                 modifier = Modifier.weight(1f),
                 text = stringRes(R.string.clipboard__header_title),
             )
+            PanelHeaderButton(
+                onClick = {
+                    val latest = filteredHistory.recent.firstOrNull() ?: filteredHistory.other.firstOrNull() ?: filteredHistory.all.firstOrNull()
+                    if (latest != null) {
+                        clipboardManager.deleteClip(latest, onlyIfUnpinned = false)
+                        context.showShortToastSync("Removed last clipboard item")
+                    }
+                },
+                modifier = sizeModifier.autoMirrorForRtl(),
+                enabled = !deviceLocked && historyEnabled && filteredHistory.all.isNotEmpty() && !isPopupSurfaceActive(),
+            ) {
+                SnyggIcon(
+                    imageVector = Icons.AutoMirrored.Filled.Undo,
+                )
+            }
             PanelHeaderButton(
                 onClick = { scope.launch { prefs.clipboard.historyEnabled.set(!historyEnabled) } },
                 modifier = sizeModifier.autoMirrorForRtl(),
@@ -533,6 +550,18 @@ fun ClipboardInputLayout(
                             ) {
                                 clipboardManager.pasteItem(popupItem!!)
                                 popupItem = null
+                            }
+                            if (popupItem!!.type == ItemType.TEXT) {
+                                PopupAction(
+                                    icon = Icons.AutoMirrored.Outlined.Assignment,
+                                    text = "Export .md",
+                                ) {
+                                    val item = popupItem!!
+                                    scope.launch(Dispatchers.IO) {
+                                        MarkdownExportUtil.exportToMarkdown(context, item)
+                                    }
+                                    popupItem = null
+                                }
                             }
                         }
                     }

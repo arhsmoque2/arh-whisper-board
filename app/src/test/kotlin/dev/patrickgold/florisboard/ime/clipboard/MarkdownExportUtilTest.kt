@@ -56,6 +56,6 @@ class MarkdownExportUtilTest {
     fun `falls back to first line if no H1 exists`() {
         val rawCommand = "git commit -m 'Initial commit of ARH Whisper Board'"
         val title = MarkdownExportUtil.extractH1Title(rawCommand)
-        assertEquals("git commit -m 'Initial commit of ARH Whisp", title)
+        assertEquals("git commit -m 'Initial commit of ARH Whisper Board'", title)
     }
 }

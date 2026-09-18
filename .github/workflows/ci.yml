@@ -33,6 +33,11 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew
 
+      - name: Fetch Sherpa-ONNX Vendored Libs
+        run: |
+          chmod +x tools/fetch-sherpa-onnx.sh
+          ./tools/fetch-sherpa-onnx.sh
+
       - name: Run Unit Tests (Touch Filter & Markdown Exporter)
         run: ./gradlew testDebugUnitTest --continue
 

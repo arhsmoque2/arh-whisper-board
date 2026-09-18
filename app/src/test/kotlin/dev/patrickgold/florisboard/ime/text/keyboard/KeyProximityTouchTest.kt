@@ -51,11 +51,11 @@ class KeyProximityTouchTest {
 
         // 1. Touch well inside Backspace (x = 700f): resolves to Backspace
         val normalDelete = keyboard.getKeyForPos(700f, 250f)
-        assertEquals(KeyCode.DELETE, normalDelete?.computedData?.code)
+        assertEquals(KeyCode.DELETE, (normalDelete?.data as? TextKeyData)?.code)
 
         // 2. Touch on the left 25% edge of Backspace (x = 610f): resolves to 'm'
         val guardedTouch = keyboard.getKeyForPos(610f, 250f)
-        assertEquals('m'.code, guardedTouch?.computedData?.code)
+        assertEquals('m'.code, (guardedTouch?.data as? TextKeyData)?.code)
     }
 
     @Test
@@ -85,6 +85,6 @@ class KeyProximityTouchTest {
 
         // Touch on left edge (x = 515f, inside first 25% of 200px enterKey): resolves to 'n'
         val guardedTouch = keyboard.getKeyForPos(515f, 250f)
-        assertEquals('n'.code, guardedTouch?.computedData?.code)
+        assertEquals('n'.code, (guardedTouch?.data as? TextKeyData)?.code)
     }
 }

@@ -46,14 +46,14 @@ object MarkdownExportUtil {
         }
 
         val firstLine = markdown.lineSequence().map { it.trim() }.firstOrNull { it.isNotEmpty() }
-        return sanitizeFileName(firstLine?.take(40) ?: "clip_${System.currentTimeMillis()}")
+        return sanitizeFileName(firstLine ?: "clip_${System.currentTimeMillis()}")
     }
 
     /**
      * Sanitizes strings into valid filesystem file names.
      */
-    fun sanitizeFileName(raw: String): String =
-        raw.trim().replace(Regex("""[\\/:*?"<>|#\r\n\t]"""), "_").take(50)
+    fun sanitizeFileName(raw: String, maxLen: Int = 80): String =
+        raw.trim().replace(Regex("""[\\/:*?"<>|#\r\n\t]"""), "_").take(maxLen)
 
     /**
      * Exports a clipboard item to a .md file in the public Downloads/ARH-Notes folder.

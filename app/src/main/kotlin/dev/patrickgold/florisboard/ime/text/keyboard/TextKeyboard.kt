@@ -17,6 +17,7 @@
 package dev.patrickgold.florisboard.ime.text.keyboard
 
 import dev.patrickgold.florisboard.ime.keyboard.Key
+import dev.patrickgold.florisboard.ime.keyboard.KeyData
 import dev.patrickgold.florisboard.ime.keyboard.Keyboard
 import dev.patrickgold.florisboard.ime.keyboard.KeyboardMode
 import dev.patrickgold.florisboard.ime.keyboard.isSplittable
@@ -51,16 +52,28 @@ class TextKeyboard(
         // When thumb taps near 'M', prevent accidental Backspace (Delete) or Enter triggers.
         // If touch lands on the left edge (first 25%) of Backspace or Enter, prioritize
         // the neighboring character key to the left.
-        if (matchedKey.computedData.code == KeyCode.DELETE || matchedKey.computedData.code == KeyCode.ENTER) {
+        val matchedKeyData = if (matchedKey.computedData != TextKeyData.UNSPECIFIED) {
+            matchedKey.computedData
+        } else {
+            matchedKey.data as? KeyData
+        }
+
+        if (matchedKeyData != null && (matchedKeyData.code == KeyCode.DELETE || matchedKeyData.code == KeyCode.ENTER)) {
             val keyWidth = matchedKey.touchBounds.width
             val relativeX = pointerX - matchedKey.touchBounds.left
             if (relativeX < keyWidth * 0.25f) {
                 var bestNeighbor: TextKey? = null
                 var minDistanceSq = Float.MAX_VALUE
                 for (other in keys()) {
-                    if (other.computedData.type == KeyType.CHARACTER && other.touchBounds.right <= matchedKey.touchBounds.left + (keyWidth * 0.15f)) {
+                    val otherData = if (other.computedData != TextKeyData.UNSPECIFIED) {
+                        other.computedData
+                    } else {
+                        other.data as? KeyData
+                    }
+                    if (otherData != null && otherData.type == KeyType.CHARACTER && other.touchBounds.right <= matchedKey.touchBounds.left + (keyWidth * 0.15f)) {
                         val dx = pointerX - other.touchBounds.right
-                        val dy = abs(pointerY - other.touchBounds.centerY)
+                        val otherCenterY = (other.touchBounds.top + other.touchBounds.bottom) / 2f
+                        val dy = abs(pointerY - otherCenterY)
                         val distSq = dx * dx + dy * dy
                         if (distSq < minDistanceSq) {
                             minDistanceSq = distSq
