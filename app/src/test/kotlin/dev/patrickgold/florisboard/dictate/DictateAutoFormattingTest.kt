@@ -20,7 +20,7 @@ import io.kotest.matchers.string.shouldStartWith
 class DictateAutoFormattingTest : FunSpec({
     context("englishNameFor maps codes to readable hints") {
         withData(
-            "de" to "German",
+            "ms" to "Malay",
             "en" to "English",
             "zh-CN" to "Mandarin (CN)",
         ) { (code, expected) ->
