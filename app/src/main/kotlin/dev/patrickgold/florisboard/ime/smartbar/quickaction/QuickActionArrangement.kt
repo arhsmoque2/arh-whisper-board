@@ -88,9 +88,6 @@ data class QuickActionArrangement(
                 QuickAction.InsertKey(TextKeyData.TOGGLE_RESIZE_MODE),
                 QuickAction.InsertKey(TextKeyData.IME_UI_MODE_CLIPBOARD),
                 QuickAction.InsertKey(TextKeyData.IME_UI_MODE_MEDIA),
-                // GIF search panel (KLIPY). Present in the action list so users can drag it into the bar
-                // for one-tap GIF access; it does nothing until a free KLIPY API key is added in settings.
-                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_GIF),
                 // Local sticker panel (issue #280): the folder the user picked, no network involved.
                 // Like the GIF action it sits in the list until dragged into the bar.
                 QuickAction.InsertKey(TextKeyData.IME_UI_MODE_STICKER),

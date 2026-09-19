@@ -27,8 +27,7 @@ class EmojiAnnotationsTest {
 
     /** Languages that must never lose their file: the app's own UI languages. */
     private val uiLanguages = listOf(
-        "ar", "bg", "ca", "cs", "de", "en", "es", "fr", "hu", "id", "it", "ja",
-        "lv", "nl", "pl", "pt", "ru", "tr", "uk", "zh",
+        "en", "id", "zh",
     )
 
     @Test

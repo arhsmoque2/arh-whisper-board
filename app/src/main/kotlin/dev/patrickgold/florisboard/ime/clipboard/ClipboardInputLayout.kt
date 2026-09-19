@@ -56,6 +56,7 @@ import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.automirrored.outlined.Backspace
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.FilterListOff
 import androidx.compose.material.icons.filled.Image
@@ -66,12 +67,16 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.ToggleOff
 import androidx.compose.material.icons.filled.ToggleOn
+import androidx.compose.material.icons.filled.VerticalAlignTop
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.outlined.ContentPasteGo
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
+import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -178,8 +183,10 @@ fun ClipboardInputLayout(
     val gridState = rememberLazyStaggeredGridState()
     var popupItem by remember(filteredHistory) { mutableStateOf<ClipboardItem?>(null) }
     var showClearAllHistory by remember { mutableStateOf(false) }
+    var editingItem by remember { mutableStateOf<ClipboardItem?>(null) }
+    var editItemText by remember { mutableStateOf("") }
 
-    fun isPopupSurfaceActive() = popupItem != null || showClearAllHistory
+    fun isPopupSurfaceActive() = popupItem != null || showClearAllHistory || editingItem != null
 
     LaunchedEffect(isFilterRowShown) {
         delay(AnimationDuration.toLong())
@@ -551,7 +558,23 @@ fun ClipboardInputLayout(
                                 clipboardManager.pasteItem(popupItem!!)
                                 popupItem = null
                             }
+                            PopupAction(
+                                icon = Icons.Default.VerticalAlignTop,
+                                text = "Move to Top",
+                            ) {
+                                clipboardManager.moveClipToTop(popupItem!!)
+                                popupItem = null
+                            }
                             if (popupItem!!.type == ItemType.TEXT) {
+                                PopupAction(
+                                    icon = Icons.Default.Edit,
+                                    text = "Edit Clip",
+                                ) {
+                                    val item = popupItem!!
+                                    editItemText = item.text ?: ""
+                                    editingItem = item
+                                    popupItem = null
+                                }
                                 PopupAction(
                                     icon = Icons.AutoMirrored.Outlined.Assignment,
                                     text = "Export .md",
@@ -624,6 +647,30 @@ fun ClipboardInputLayout(
                             }
                         }
                     }
+                }
+            }
+
+            if (editingItem != null) {
+                val targetItem = editingItem!!
+                JetPrefAlertDialog(
+                    title = "Edit Clipboard Item",
+                    confirmLabel = stringRes(R.string.action__save),
+                    dismissLabel = stringRes(R.string.action__cancel),
+                    onDismiss = { editingItem = null },
+                    onConfirm = {
+                        val newText = editItemText
+                        clipboardManager.updateClipText(targetItem, newText)
+                        editingItem = null
+                    },
+                ) {
+                    OutlinedTextField(
+                        value = editItemText,
+                        onValueChange = { editItemText = it },
+                        label = { Text("Content") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                    )
                 }
             }
         }

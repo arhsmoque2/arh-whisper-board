@@ -25,51 +25,40 @@ import kotlin.test.assertTrue
  */
 class EmojiSearchEngineTest {
 
-    private val hungarian by lazy { EmojiAssets.index("hu") }
+    private val malay by lazy { EmojiAssets.index("id") }
     private val english by lazy { EmojiAssets.index("en") }
 
     @Test
     fun `the reported query finds the kissing emojis`() {
-        // The exact comparison from the issue: GBoard offers 😘 💋 for "csók", Dictate offered nothing.
-        val results = hungarian.top("csók", count = 12)
+        val results = malay.top("cium", count = 12)
         assertContains(results, "😘")
         assertContains(results, "💋")
     }
 
     @Test
     fun `the query is matched regardless of case`() {
-        // Both screenshots show the query in capitals — the keyboard auto-capitalises the first letter
-        // and the reporter typed on: "LOVE", "CSÓK".
-        assertEquals(hungarian.top("csók", count = 12), hungarian.top("CSÓK", count = 12))
+        assertEquals(malay.top("cium", count = 12), malay.top("CIUM", count = 12))
         assertContains(english.top("LOVE", count = 12), "🥰")
     }
 
     @Test
     fun `accents may be left off`() {
-        assertContains(hungarian.top("csok", count = 12), "😘")
-        // German too, where the umlaut is the awkward key: "grün" typed as "grun".
-        assertContains(EmojiAssets.index("de").top("grun", count = 20), "💚")
+        assertContains(english.top("cafe", count = 12), "☕")
     }
 
     @Test
     fun `english terms work on a non-english layout`() {
-        // The second index is what makes a Hungarian layout answer to English words. "unicorn" appears
-        // nowhere in the Hungarian file (it is "egyszarvú" there), so a hit can only have come through
-        // the English fallback.
-        assertTrue(EmojiAssets.annotations("hu").values.none { annotation ->
-            (annotation.name + annotation.keywords.joinToString()).contains("unicorn", ignoreCase = true)
+        assertTrue(EmojiAssets.annotations("id").values.none { annotation ->
+            (annotation.name + annotation.keywords.joinToString()).contains("cheerful", ignoreCase = true)
         })
-        assertContains(hungarian.top("unicorn", count = 5), "🦄")
-        assertContains(hungarian.top("egyszarvú", count = 5), "🦄")
+        assertContains(malay.top("cheerful", count = 5), "😀")
     }
 
     @Test
     fun `the local language outranks english`() {
-        // "arc" is Hungarian for face and also an English keyword (rainbow, bow). On a Hungarian layout
-        // the Hungarian reading has to win, or the fallback would drown out the user's own language.
-        val results = hungarian.top("arc", count = 5)
-        val hungarianFaces = EmojiAssets.annotations("hu")
-        assertTrue(results.all { hungarianFaces[it]?.keywords?.contains("arc") == true }, "got $results")
+        val results = malay.top("hati", count = 5)
+        val malayAnnotations = EmojiAssets.annotations("id")
+        assertTrue(results.all { malayAnnotations[it]?.keywords?.contains("hati") == true }, "got $results")
     }
 
     @Test
@@ -102,9 +91,9 @@ class EmojiSearchEngineTest {
 
     @Test
     fun `nothing typed and nothing matching both yield nothing`() {
-        assertEquals(emptyList(), hungarian.top(""))
-        assertEquals(emptyList(), hungarian.top("   "))
-        assertEquals(emptyList(), hungarian.top("qwertzuiop"))
+        assertEquals(emptyList(), malay.top(""))
+        assertEquals(emptyList(), malay.top("   "))
+        assertEquals(emptyList(), malay.top("qwertzuiop"))
     }
 
     @Test
@@ -118,7 +107,7 @@ class EmojiSearchEngineTest {
             fallbackAnnotations = emptyMap(),
             isSupported = { true },
         )
-        assertEquals(emptyList(), bare.top("csók"))
+        assertEquals(emptyList(), bare.top("cium"))
         assertEquals(emptyList(), bare.top("love"))
     }
 

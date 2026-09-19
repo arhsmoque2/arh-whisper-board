@@ -85,6 +85,10 @@ internal object EvalKeyboard {
             if (candidate.isFile) return candidate
             val here = File(dir, "src/main/assets/ime/dict/$name")
             if (here.isFile) return here
+            val testCandidate = File(dir, "app/src/test/resources/ime/dict/$name")
+            if (testCandidate.isFile) return testCandidate
+            val testHere = File(dir, "src/test/resources/ime/dict/$name")
+            if (testHere.isFile) return testHere
             dir = dir.parentFile ?: return@repeat
         }
         error("could not locate ime/dict/$name — run from the repository or the app module")

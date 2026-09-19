@@ -1499,6 +1499,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             KeyCode.TOGGLE_RESIZE_MODE -> windowController.editor.toggleEnabled()
             KeyCode.DELETE -> handleBackwardDelete(OperationUnit.CHARACTERS)
             KeyCode.DELETE_WORD -> handleBackwardDelete(OperationUnit.WORDS)
+            KeyCode.DELETE_ALL -> editorInstance.clearAllText()
             KeyCode.ENTER -> handleEnter()
             KeyCode.FORWARD_DELETE -> handleForwardDelete(OperationUnit.CHARACTERS)
             KeyCode.FORWARD_DELETE_WORD -> handleForwardDelete(OperationUnit.WORDS)
@@ -1522,8 +1523,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             // any previous search so it opens on the home view (recent GIFs + trending).
             KeyCode.IME_UI_MODE_GIF -> {
                 closeEmojiSearch(returnToMedia = false)
-                gifSearchSubmit.value = null
-                activeState.imeUiMode = ImeUiMode.GIF
+                activeState.imeUiMode = ImeUiMode.MEDIA
             }
             // Opens the local sticker panel (issue #280) — the user's own folder, no network involved.
             KeyCode.IME_UI_MODE_STICKER -> {

@@ -173,6 +173,7 @@ fun KeyboardScreen() = FlorisScreen {
                 max = 700,
                 stepIncrement = 10,
             )
+            SlashKeyPopupsSetting()
             SwitchPreference(
                 prefs.keyboard.spaceBarSwitchesToCharacters,
                 modifier = Modifier.settingsSearchAnchor("pref__keyboard__space_bar_switches_to_characters__label"),

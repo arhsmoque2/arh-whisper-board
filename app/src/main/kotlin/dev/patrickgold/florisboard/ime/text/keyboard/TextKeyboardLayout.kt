@@ -120,13 +120,8 @@ fun TextKeyboardLayout(
     val glideTypingManager by context.glideTypingManager()
 
     val keyboard = evaluator.keyboard as TextKeyboard
-    val glideEnabledInternal by prefs.glide.enabled.collectAsState()
-    // Suppressed while the modern keyboard is reached via the legacy swipe gesture (issue #125), so a
-    // horizontal glide doesn't swallow the swipe-back that returns to the dictation UI.
-    val glideSuppressed by dev.patrickgold.florisboard.dictate.ui.LegacyLayoutState.suppressGlide.collectAsState()
-    val glideEnabled = glideEnabledInternal && !glideSuppressed && evaluator.editorInfo.isRichInputEditor &&
-        evaluator.state.keyVariation != KeyVariation.PASSWORD && !isTouchExplorationEnabled(context)
-    val glideShowTrail by prefs.glide.showTrail.collectAsState()
+    val glideEnabled = false
+    val glideShowTrail = false
     val glideTrailStyle = rememberSnyggThemeQuery(FlorisImeUi.GlideTrail.elementName)
     val glideTrailColor = glideTrailStyle.foreground(default = Color.Green)
 
@@ -137,9 +132,6 @@ fun TextKeyboardLayout(
             // Feed key geometry to the autocorrect proximity model regardless of glide (which is off for
             // many users); the glide classifier still only gets it when glide is enabled.
             KeyProximityInfo.update(keys)
-            if (glideEnabled) {
-                glideTypingManager.setLayout(keys)
-            }
         }
     }
     val touchEventChannel = remember { Channel<MotionEvent>(64) }
@@ -157,10 +149,8 @@ fun TextKeyboardLayout(
 
     DisposableEffect(Unit) {
         controller.glideTypingDetector.registerListener(controller)
-        controller.glideTypingDetector.registerListener(glideTypingManager)
         onDispose {
             controller.glideTypingDetector.unregisterListener(controller)
-            controller.glideTypingDetector.unregisterListener(glideTypingManager)
             resetAllKeys()
         }
     }
@@ -470,10 +460,7 @@ private class TextKeyboardLayoutController(
     lateinit var keyboard: TextKeyboard
     var size = Size.Zero
 
-    val isGlideEnabled: Boolean get() = prefs.glide.enabled.get() &&
-        !dev.patrickgold.florisboard.dictate.ui.LegacyLayoutState.suppressGlide.value &&
-        editorInstance.activeInfo.isRichInputEditor &&
-        keyboardManager.activeState.keyVariation != KeyVariation.PASSWORD && !isTouchExplorationEnabled(appContext)
+    val isGlideEnabled: Boolean get() = false
 
     /**
      * Reported from composition once the keyboard a momentary layer asked for has been laid out
@@ -690,6 +677,20 @@ private class TextKeyboardLayoutController(
                                 false
                             }
                         }
+                    }
+                },
+                onRepeat = {
+                    if (key.computedData.code == KeyCode.DELETE || key.computedData.code == KeyCode.DELETE_WORD) {
+                        val ic = FlorisImeService.currentInputConnection()
+                        val before = ic?.getTextBeforeCursor(1, 0)
+                        if (before != null) {
+                            before.isNotEmpty()
+                        } else {
+                            editorInstance.activeContent.textBeforeSelection.isNotEmpty() ||
+                                editorInstance.activeContent.selectedText.isNotEmpty()
+                        }
+                    } else {
+                        true
                     }
                 },
             )

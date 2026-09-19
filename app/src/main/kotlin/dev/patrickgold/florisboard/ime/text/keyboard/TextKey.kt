@@ -133,6 +133,26 @@ class TextKey(override val data: AbstractKeyData) : Key(data) {
                     keySpecificPopupSet?.let { merge(it, evaluator) }
                     popupSet?.let { merge(it, evaluator) }
                 }
+                if (computed.code == 47 || computedLabel == "/") {
+                    try {
+                        val prefs by FlorisPreferenceStore
+                        val rawTokens = prefs.keyboard.slashKeyPopups.get().split("\\s+".toRegex()).filter { it.isNotBlank() }
+                        if (rawTokens.isNotEmpty()) {
+                            computedPopups.main = TextKeyData(code = rawTokens[0].codePointAt(0), type = KeyType.CHARACTER, label = rawTokens[0])
+                            for (i in 1 until rawTokens.size) {
+                                computedPopups.relevant.add(TextKeyData(code = rawTokens[i].codePointAt(0), type = KeyType.CHARACTER, label = rawTokens[i]))
+                            }
+                        }
+                    } catch (_: Throwable) {
+                    }
+                }
+                if (computed.code == KeyCode.DELETE) {
+                    computedPopups.main = TextKeyData(
+                        code = KeyCode.DELETE_ALL,
+                        type = KeyType.ENTER_EDITING,
+                        label = "🗑️ Clear",
+                    )
+                }
                 if (computed.type == KeyType.CHARACTER) {
                     addComputedHints(computed.code, evaluator, extendedPopups, extendedPopupsDefault)
                 }

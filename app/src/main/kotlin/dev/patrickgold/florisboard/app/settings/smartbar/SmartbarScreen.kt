@@ -16,8 +16,16 @@
 
 package dev.patrickgold.florisboard.app.settings.smartbar
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
@@ -26,9 +34,13 @@ import dev.patrickgold.florisboard.ime.smartbar.CandidatesDisplayMode
 import dev.patrickgold.florisboard.ime.smartbar.ExtendedActionsPlacement
 import dev.patrickgold.florisboard.ime.smartbar.SmartbarLayout
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
+import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.datastore.ui.ListPreference
+import dev.patrickgold.jetpref.datastore.ui.Preference
 import dev.patrickgold.jetpref.datastore.ui.PreferenceGroup
 import dev.patrickgold.jetpref.datastore.ui.SwitchPreference
+import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
+import kotlinx.coroutines.launch
 import org.florisboard.lib.compose.stringRes
 
 @Composable
@@ -101,6 +113,77 @@ fun SmartbarScreen() = FlorisScreen {
                 enabledIf = { prefs.smartbar.enabled isEqualTo true },
                 visibleIf = { prefs.smartbar.layout isEqualTo SmartbarLayout.SUGGESTIONS_ACTIONS_EXTENDED },
             )
+        }
+
+        PreferenceGroup(title = "Quick Snippets & Symbol Shortcuts") {
+            val scope = rememberCoroutineScope()
+            val rawSnippets by prefs.smartbar.quickSnippets.collectAsState()
+            var editSnippetsDialog by remember { mutableStateOf(false) }
+            var editSnippetsText by remember(rawSnippets) { mutableStateOf(rawSnippets) }
+
+            Preference(
+                title = "Quick Text Snippets",
+                summary = "Single-line snippets committed on tap (e.g. /resume, /usage, /clear)",
+                onClick = {
+                    editSnippetsText = rawSnippets
+                    editSnippetsDialog = true
+                },
+            )
+
+            val rawSymbols by prefs.smartbar.symbolShortcuts.collectAsState()
+            var editSymbolsDialog by remember { mutableStateOf(false) }
+            var editSymbolsText by remember(rawSymbols) { mutableStateOf(rawSymbols) }
+
+            Preference(
+                title = "Symbol & Email Shortcuts",
+                summary = rawSymbols,
+                onClick = {
+                    editSymbolsText = rawSymbols
+                    editSymbolsDialog = true
+                },
+            )
+
+            if (editSnippetsDialog) {
+                JetPrefAlertDialog(
+                    title = "Edit Quick Text Snippets",
+                    confirmLabel = stringRes(R.string.action__save),
+                    dismissLabel = stringRes(R.string.action__cancel),
+                    onDismiss = { editSnippetsDialog = false },
+                    onConfirm = {
+                        scope.launch { prefs.smartbar.quickSnippets.set(editSnippetsText) }
+                        editSnippetsDialog = false
+                    },
+                ) {
+                    OutlinedTextField(
+                        value = editSnippetsText,
+                        onValueChange = { editSnippetsText = it },
+                        label = { Text("One snippet per line") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 4,
+                    )
+                }
+            }
+
+            if (editSymbolsDialog) {
+                JetPrefAlertDialog(
+                    title = "Edit Symbol & Email Shortcuts",
+                    confirmLabel = stringRes(R.string.action__save),
+                    dismissLabel = stringRes(R.string.action__cancel),
+                    onDismiss = { editSymbolsDialog = false },
+                    onConfirm = {
+                        scope.launch { prefs.smartbar.symbolShortcuts.set(editSymbolsText) }
+                        editSymbolsDialog = false
+                    },
+                ) {
+                    OutlinedTextField(
+                        value = editSymbolsText,
+                        onValueChange = { editSymbolsText = it },
+                        label = { Text("Space-separated symbols") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                    )
+                }
+            }
         }
     }
 }

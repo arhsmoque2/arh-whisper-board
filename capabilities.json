@@ -1,0 +1,91 @@
+{
+  "version": "1.0.0",
+  "name": "ARH-Whisper-Board",
+  "description": "ARH Whisper Board Native Capabilities & Invariants Specification",
+  "capabilities": [
+    {
+      "id": "proximate_edge_protection",
+      "name": "Proximate Edge Protection",
+      "description": "Asymmetric touch boundaries and gravity wells accommodating thumb retraction undershoot on outer keys (A, Q, Z, P, M) and preventing destructive misfires on Backspace and Enter.",
+      "category": "touch_engine",
+      "status": "active"
+    },
+    {
+      "id": "touch_calibration_wizard",
+      "name": "Touch Calibration Wizard",
+      "description": "Interactive active-learning calibration mode with targeted drill prompts, empirical drift vector calculation, and an undoable/revertible checkpoint history stack.",
+      "category": "touch_engine",
+      "status": "active"
+    },
+    {
+      "id": "touch_beam_decoder",
+      "name": "Touch Beam Decoder",
+      "description": "Noisy-channel spatial beam search over landed taps and language model priors, finding intended words directly from tap distance evidence.",
+      "category": "nlp_decoder",
+      "status": "active"
+    },
+    {
+      "id": "stt_cloud_streaming_websocket",
+      "name": "STT Cloud Streaming WebSocket",
+      "description": "Real-time duplex 16kHz PCM audio streaming over persistent WebSocket directly to Whisper backends with ~180ms time-to-first-token.",
+      "category": "voice_ai",
+      "status": "active"
+    },
+    {
+      "id": "stt_on_device_whisper",
+      "name": "On-Device Whisper Fallback",
+      "description": "Local Sherpa-ONNX quantized Whisper Tiny Q5_1 offline speech recognition engine requiring zero network connectivity.",
+      "category": "voice_ai",
+      "status": "active"
+    },
+    {
+      "id": "ai_prompt_rewording",
+      "name": "AI Prompt Rewording",
+      "description": "Direct keyboard smartbar integration with OpenRouter and local LLMs for one-tap text rewording (Executive, Grammar, BM Formal, Bulletize).",
+      "category": "voice_ai",
+      "status": "active"
+    },
+    {
+      "id": "markdown_clipboard_history",
+      "name": "Markdown Clipboard History",
+      "description": "Room database persistent clipboard with HTML-to-Markdown table ingestion, code fence retention, and auto-H1 file exporter.",
+      "category": "clipboard",
+      "status": "active"
+    },
+    {
+      "id": "transactional_clipboard_undo",
+      "name": "Transactional Clipboard Undo",
+      "description": "10-item transient revision ring buffer preventing destructive clipboard overwrites and data loss.",
+      "category": "clipboard",
+      "status": "active"
+    },
+    {
+      "id": "zero_gc_touch_dispatch",
+      "name": "Zero-GC Touch Dispatch",
+      "description": "Allocation-free hot touch loop eliminating MotionEvent iterator allocations in Compose gesture handling for locked 60/120 FPS.",
+      "category": "performance",
+      "status": "active"
+    },
+    {
+      "id": "snygg_theme_engine",
+      "name": "Snygg Theme Engine",
+      "description": "Declarative CSS-like styling parser and dynamic Material You color palette adaptation.",
+      "category": "ui_engine",
+      "status": "active"
+    },
+    {
+      "id": "floris_smartbar",
+      "name": "Floris Smartbar",
+      "description": "Dynamic quick-action bar providing word suggestions, voice toggle, clipboard manager drawer, and prompt chips.",
+      "category": "ui_engine",
+      "status": "active"
+    },
+    {
+      "id": "custom_quick_text_snippets",
+      "name": "Custom Quick Text Snippets",
+      "description": "Smartbar quick-access snippet engine allowing instant 1-tap insertion of user-defined commands and texts (e.g. /resume, /usage, /clear) at cursor without view switching.",
+      "category": "productivity",
+      "status": "active"
+    }
+  ]
+}

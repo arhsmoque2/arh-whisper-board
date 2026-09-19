@@ -111,14 +111,16 @@ class InputEventDispatcher private constructor(private val repeatableKeyCodes: I
                         pressedKeyInfo.blockUp = true
                     } else if (repeatableKeyCodes.contains(data.code)) {
                         val repeatData = determineRepeatData(data)
-                        val repeatDelay = determineRepeatDelay(repeatData)
+                        var currentRepeatDelay = determineRepeatDelay(repeatData)
                         while (isActive) {
                             val onRepeatResult = withContext(Dispatchers.Main) { onRepeat() }
-                            if (onRepeatResult) {
-                                keyEventReceiver?.onInputKeyRepeat(repeatData)
-                                pressedKeyInfo.blockUp = true
+                            if (!onRepeatResult) break
+                            keyEventReceiver?.onInputKeyRepeat(repeatData)
+                            pressedKeyInfo.blockUp = true
+                            if (repeatData.code == KeyCode.DELETE || repeatData.code == KeyCode.DELETE_WORD) {
+                                currentRepeatDelay = (currentRepeatDelay * 0.9f).toLong().coerceAtLeast(15L)
                             }
-                            delay(repeatDelay)
+                            delay(currentRepeatDelay)
                         }
                     }
                 }

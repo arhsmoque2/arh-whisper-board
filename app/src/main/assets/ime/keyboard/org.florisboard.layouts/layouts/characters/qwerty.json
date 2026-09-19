@@ -20,7 +20,8 @@
     { "$": "auto_text_key", "code":  104, "label": "h" },
     { "$": "auto_text_key", "code":  106, "label": "j" },
     { "$": "auto_text_key", "code":  107, "label": "k" },
-    { "$": "auto_text_key", "code":  108, "label": "l" }
+    { "$": "auto_text_key", "code":  108, "label": "l" },
+    { "$": "auto_text_key", "code":   47, "label": "/" }
   ],
   [
     { "$": "auto_text_key", "code":  122, "label": "z" },

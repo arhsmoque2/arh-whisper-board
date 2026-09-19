@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.FormatClear
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.SpaceBar
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -72,6 +73,20 @@ fun TypingScreen() = FlorisScreen {
                 icon = Icons.AutoMirrored.Filled.LibraryBooks,
                 title = stringRes(R.string.settings__dictionary__title),
                 onClick = { navController.navigate(Routes.Settings.Dictionary) },
+            )
+        }
+
+        PreferenceGroup(title = "Touch Calibration & Ergonomics") {
+            Preference(
+                icon = Icons.Default.Tune,
+                title = "Touch Calibration Wizard",
+                summary = "Active drill calibration for thumb retraction undershoot (Poco F7 & large screens)",
+                onClick = { navController.navigate(Routes.Settings.TouchCalibration) },
+            )
+            SwitchPreference(
+                prefs.touchCalibration.enabled,
+                title = "Enable Calibrated Touch Engine",
+                summary = "Applies dynamic Voronoi centroids, margin offsets, and tuned variance",
             )
         }
 

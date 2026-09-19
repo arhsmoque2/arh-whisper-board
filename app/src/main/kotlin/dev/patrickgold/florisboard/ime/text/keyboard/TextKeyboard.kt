@@ -40,10 +40,16 @@ class TextKeyboard(
 
     override fun getKeyForPos(pointerX: Float, pointerY: Float): TextKey? {
         var matchedKey: TextKey? = null
-        rowLoop@ for (row in arrangement) {
-            for (key in row) {
+        var matchedRow = -1
+        var matchedCol = -1
+        rowLoop@ for (r in arrangement.indices) {
+            val row = arrangement[r]
+            for (c in row.indices) {
+                val key = row[c]
                 if (key.touchBounds.contains(pointerX, pointerY)) {
                     matchedKey = key
+                    matchedRow = r
+                    matchedCol = c
                     break@rowLoop
                 }
             }
@@ -51,42 +57,97 @@ class TextKeyboard(
         if (matchedKey == null) return null
 
         // Proximate touch protection:
-        // When thumb taps near 'M', prevent accidental Backspace (Delete) or Enter triggers.
-        // If touch lands on the left edge (first 25%) of Backspace or Enter, prioritize
-        // the neighboring character key to the left.
+        // Mitigates thumb retraction undershoot on boundary keys and guards Delete/Enter.
         val matchedKeyData = if (matchedKey.computedData != TextKeyData.UNSPECIFIED) {
             matchedKey.computedData
         } else {
             matchedKey.data as? KeyData
         }
 
-        if (matchedKeyData != null && (matchedKeyData.code == KeyCode.DELETE || matchedKeyData.code == KeyCode.ENTER)) {
+        if (matchedKeyData != null) {
             val keyWidth = matchedKey.touchBounds.width
             val relativeX = pointerX - matchedKey.touchBounds.left
-            if (relativeX < keyWidth * 0.25f) {
-                var bestNeighbor: TextKey? = null
-                var minDistanceSq = Float.MAX_VALUE
-                for (row in arrangement) {
-                    for (other in row) {
-                        val otherData = if (other.computedData != TextKeyData.UNSPECIFIED) {
-                            other.computedData
-                        } else {
-                            other.data as? KeyData
-                        }
-                        if (otherData != null && otherData.type == KeyType.CHARACTER && other.touchBounds.right <= matchedKey.touchBounds.left + (keyWidth * 0.15f)) {
-                            val dx = pointerX - other.touchBounds.right
-                            val otherCenterY = (other.touchBounds.top + other.touchBounds.bottom) / 2f
-                            val dy = abs(pointerY - otherCenterY)
-                            val distSq = dx * dx + dy * dy
-                            if (distSq < minDistanceSq) {
-                                minDistanceSq = distSq
-                                bestNeighbor = other
+
+            if (matchedKeyData.code == KeyCode.DELETE || matchedKeyData.code == KeyCode.ENTER) {
+                if (relativeX < keyWidth * 0.25f) {
+                    var bestNeighbor: TextKey? = null
+                    var minDistanceSq = Float.MAX_VALUE
+                    for (row in arrangement) {
+                        for (other in row) {
+                            val otherData = if (other.computedData != TextKeyData.UNSPECIFIED) {
+                                other.computedData
+                            } else {
+                                other.data as? KeyData
+                            }
+                            if (otherData != null && otherData.type == KeyType.CHARACTER && other.touchBounds.right <= matchedKey.touchBounds.left + (keyWidth * 0.15f)) {
+                                val dx = pointerX - other.touchBounds.right
+                                val otherCenterY = (other.touchBounds.top + other.touchBounds.bottom) / 2f
+                                val dy = abs(pointerY - otherCenterY)
+                                val distSq = dx * dx + dy * dy
+                                if (distSq < minDistanceSq) {
+                                    minDistanceSq = distSq
+                                    bestNeighbor = other
+                                }
                             }
                         }
                     }
+                    if (bestNeighbor != null) {
+                        return bestNeighbor
+                    }
                 }
-                if (bestNeighbor != null) {
-                    return bestNeighbor
+            } else if (matchedRow >= 0 && matchedCol >= 0) {
+                val currentRow = arrangement[matchedRow]
+                when (matchedKeyData.code) {
+                    's'.code, 'S'.code -> {
+                        // Left thumb retraction: user aiming for 'a'/'A' hits leftmost 22% of 's'
+                        if (relativeX < keyWidth * 0.22f && matchedCol > 0) {
+                            val neighbor = currentRow[matchedCol - 1]
+                            val nData = if (neighbor.computedData != TextKeyData.UNSPECIFIED) neighbor.computedData else neighbor.data as? KeyData
+                            if (nData != null && (nData.code == 'a'.code || nData.code == 'A'.code)) {
+                                return neighbor
+                            }
+                        }
+                    }
+                    'w'.code, 'W'.code -> {
+                        // Left thumb retraction: user aiming for 'q'/'Q' hits leftmost 20% of 'w'
+                        if (relativeX < keyWidth * 0.20f && matchedCol > 0) {
+                            val neighbor = currentRow[matchedCol - 1]
+                            val nData = if (neighbor.computedData != TextKeyData.UNSPECIFIED) neighbor.computedData else neighbor.data as? KeyData
+                            if (nData != null && (nData.code == 'q'.code || nData.code == 'Q'.code)) {
+                                return neighbor
+                            }
+                        }
+                    }
+                    'x'.code, 'X'.code -> {
+                        // Left thumb retraction: user aiming for 'z'/'Z' hits leftmost 20% of 'x'
+                        if (relativeX < keyWidth * 0.20f && matchedCol > 0) {
+                            val neighbor = currentRow[matchedCol - 1]
+                            val nData = if (neighbor.computedData != TextKeyData.UNSPECIFIED) neighbor.computedData else neighbor.data as? KeyData
+                            if (nData != null && (nData.code == 'z'.code || nData.code == 'Z'.code)) {
+                                return neighbor
+                            }
+                        }
+                    }
+                    'o'.code, 'O'.code -> {
+                        // Right thumb extension undershoot: user aiming for 'p'/'P' hits rightmost 20% of 'o'
+                        if (relativeX > keyWidth * 0.80f && matchedCol + 1 < currentRow.size) {
+                            val neighbor = currentRow[matchedCol + 1]
+                            val nData = if (neighbor.computedData != TextKeyData.UNSPECIFIED) neighbor.computedData else neighbor.data as? KeyData
+                            if (nData != null && (nData.code == 'p'.code || nData.code == 'P'.code)) {
+                                return neighbor
+                            }
+                        }
+                    }
+                    ','.code -> {
+                        // Right thumb corner undershoot: user aiming for 'm'/'M' hits leftmost 20% of ','
+                        if (relativeX < keyWidth * 0.20f && matchedCol > 0) {
+                            val neighbor = currentRow[matchedCol - 1]
+                            val nData = if (neighbor.computedData != TextKeyData.UNSPECIFIED) neighbor.computedData else neighbor.data as? KeyData
+                            if (nData != null && (nData.code == 'm'.code || nData.code == 'M'.code)) {
+                                return neighbor
+                            }
+                        }
+                    }
                 }
             }
         }

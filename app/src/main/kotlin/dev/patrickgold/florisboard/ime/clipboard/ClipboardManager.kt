@@ -531,6 +531,18 @@ class ClipboardManager(
         }
     }
 
+    fun updateClipText(item: ClipboardItem, newText: String) {
+        ioScope.launch {
+            clipHistoryDao?.update(item.copy(text = newText))
+        }
+    }
+
+    fun moveClipToTop(item: ClipboardItem) {
+        ioScope.launch {
+            clipHistoryDao?.update(item.copy(creationTimestampMs = System.currentTimeMillis()))
+        }
+    }
+
     fun pasteItem(item: ClipboardItem) {
         val editorInstance by appContext.editorInstance()
         editorInstance.commitClipboardItem(item).also { result ->

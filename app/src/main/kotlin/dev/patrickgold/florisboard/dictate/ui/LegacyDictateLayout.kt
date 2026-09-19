@@ -464,9 +464,6 @@ private fun LegacyActionKey(
         LegacyEditAction.HISTORY -> ThemedIconKey(KeyCode.NOOP, action.icon, label, modifier) {
             keyboardManager.activeState.imeUiMode = ImeUiMode.HISTORY
         }
-        LegacyEditAction.GIF -> ThemedIconKey(KeyCode.NOOP, action.icon, label, modifier) {
-            keyboardManager.activeState.imeUiMode = ImeUiMode.GIF
-        }
         LegacyEditAction.STICKER -> ThemedIconKey(KeyCode.NOOP, action.icon, label, modifier) {
             keyboardManager.activeState.imeUiMode = ImeUiMode.STICKER
         }

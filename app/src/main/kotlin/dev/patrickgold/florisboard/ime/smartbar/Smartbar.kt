@@ -281,10 +281,25 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
                 enter = enterTransition,
                 exit = exitTransition,
             ) {
-                if (shouldShowInlineSuggestionsUi) {
-                    InlineSuggestionsUi(inlineSuggestions)
-                } else {
-                    CandidatesRow()
+                val activeMode by SmartbarModeState.mode.collectAsState()
+                androidx.compose.foundation.layout.Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SmartbarModeToggleChip()
+                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                        when (activeMode) {
+                            SmartbarMode.CANDIDATES -> {
+                                if (shouldShowInlineSuggestionsUi) {
+                                    InlineSuggestionsUi(inlineSuggestions)
+                                } else {
+                                    CandidatesRow()
+                                }
+                            }
+                            SmartbarMode.SYMBOLS -> SymbolsRow()
+                            SmartbarMode.SNIPPETS -> QuickSnippetsRow()
+                        }
+                    }
                 }
             }
             this@CenterContent.AnimatedVisibility(

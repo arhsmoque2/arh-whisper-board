@@ -53,10 +53,10 @@ class StylePromptLanguageTest {
     }
 
     @Test
-    fun `croatian gets croatian`() {
-        val hr = DictatePromptDefaults.punctuationPromptFor("hr")
-        assertEquals("Bok. Hvala lijepa.", hr)
-        assertNotEquals(DictatePromptDefaults.PUNCTUATION_CAPITALIZATION, hr)
+    fun `malay gets malay`() {
+        val ms = DictatePromptDefaults.punctuationPromptFor("ms")
+        assertEquals("Helo. Terima kasih banyak.", ms)
+        assertNotEquals(DictatePromptDefaults.PUNCTUATION_CAPITALIZATION, ms)
     }
 
     @Test
@@ -66,8 +66,8 @@ class StylePromptLanguageTest {
 
     @Test
     fun `a regional code falls back to its base language, not to english`() {
-        assertEquals(DictatePromptDefaults.punctuationPromptFor("hr"), DictatePromptDefaults.punctuationPromptFor("hr-HR"))
-        assertEquals(DictatePromptDefaults.punctuationPromptFor("de"), DictatePromptDefaults.punctuationPromptFor("de-AT"))
+        assertEquals(DictatePromptDefaults.punctuationPromptFor("zh-cn"), DictatePromptDefaults.punctuationPromptFor("zh-CN"))
+        assertEquals(DictatePromptDefaults.punctuationPromptFor("ms"), DictatePromptDefaults.punctuationPromptFor("ms-MY"))
     }
 
     @Test

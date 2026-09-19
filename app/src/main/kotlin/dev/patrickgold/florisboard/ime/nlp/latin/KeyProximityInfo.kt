@@ -108,8 +108,17 @@ object KeyProximityInfo {
     @Volatile
     private var keyWidthPx: Float = 0f
 
+    /**
+     * Active touch calibration profile providing empirical centroid shifts and touch variance.
+     */
+    @Volatile
+    var activeProfile: dev.patrickgold.florisboard.ime.text.keyboard.TouchCalibrationProfile? = null
+
     /** Update from the currently rendered character keys. Cheap; called on each layout of the letters view. */
-    fun update(keys: List<TextKey>) {
+    fun update(
+        keys: List<TextKey>,
+        profile: dev.patrickgold.florisboard.ime.text.keyboard.TouchCalibrationProfile? = activeProfile,
+    ) {
         if (keys.isEmpty()) return
         var width = 0f
         for (k in keys) {
@@ -125,13 +134,25 @@ object KeyProximityInfo {
         val codes = ArrayList<Int>(keys.size)
         val xs = ArrayList<Float>(keys.size)
         val ys = ArrayList<Float>(keys.size)
+        val active = if (profile != null && profile.isEnabled) profile else null
+
+        // Sync touch variance with active profile
+        TouchScoring.configuredSigma2 = active?.sigma2 ?: TouchScoring.TOUCH_SIGMA2
+
         for (k in keys) {
             val code = (k.data as? KeyData)?.code ?: continue
             if (code < 32) continue // skip control/action keys (space, shift, delete, …)
             val bounds = k.visibleBounds
             codes.add(code)
-            xs.add(bounds.center.x / width)
-            ys.add(bounds.center.y / width)
+            var cx = bounds.center.x / width
+            var cy = bounds.center.y / width
+            if (active != null) {
+                val (dx, dy) = active.getOffset(code)
+                cx += dx
+                cy += dy
+            }
+            xs.add(cx)
+            ys.add(cy)
         }
         if (codes.isEmpty()) return
         keyWidthPx = width
