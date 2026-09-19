@@ -60,7 +60,7 @@ object DictateMappingsText {
         var unusable = 0
         var truncated = false
         for (line in text.lineSequence()) {
-            val trimmed = line.removePrefix("﻿").trim()
+            val trimmed = line.removePrefix("\uFEFF").trim()
             if (trimmed.isEmpty() || trimmed.startsWith("#") || trimmed.startsWith("//")) continue
             val mapping = mappingFrom(trimmed)
             if (mapping == null) {

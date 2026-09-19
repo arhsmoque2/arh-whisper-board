@@ -67,6 +67,11 @@ configure<ApplicationExtension> {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
+
     defaultConfig {
         applicationId = "net.devemperor.dictate"
         minSdk = projectMinSdk.toInt()

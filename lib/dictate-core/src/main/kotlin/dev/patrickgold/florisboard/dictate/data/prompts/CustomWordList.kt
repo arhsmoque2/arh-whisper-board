@@ -121,7 +121,7 @@ object CustomWordList {
         val body = if (truncated) text.take(MAX_IMPORT_BYTES) else text
 
         outer@ for (line in body.lineSequence()) {
-            val trimmed = line.removePrefix("﻿").trim()
+            val trimmed = line.removePrefix("\uFEFF").trim()
             // A word list may carry a header or a note; `#foo` as an actual entry does not happen.
             if (trimmed.isEmpty() || trimmed.startsWith("#") || trimmed.startsWith("//")) continue
             for (fragment in trimmed.split(',')) {
