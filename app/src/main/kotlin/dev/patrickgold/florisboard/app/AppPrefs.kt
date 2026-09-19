@@ -1763,7 +1763,7 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
     inner class TouchCalibration {
         val enabled = boolean(
             key = "touch_calibration__enabled",
-            default = true,
+            default = false,
         )
         val activeProfilePortrait = custom(
             key = "touch_calibration__active_profile_portrait",

@@ -277,7 +277,7 @@ class ImeWindowController(
                 val constraints = ImeWindowConstraints.of(rootInsets, windowConfig.fixedMode)
                 var props = (windowConfig.fixedProps[windowConfig.fixedMode] ?: constraints.defaultProps)
                 val calibration = prefs.touchCalibration
-                if (windowConfig.fixedMode == ImeWindowMode.Fixed.NORMAL && calibration.enabled.get()) {
+                if (windowConfig.fixedMode == ImeWindowMode.Fixed.NORMAL && calibration.enabled.get() && !editor.state.value.isEnabled && windowConfig.fixedProps[windowConfig.fixedMode] == null) {
                     val rootBounds = rootInsets.boundsDp
                     val isPortrait = rootBounds.width <= rootBounds.height
                     val profile = if (isPortrait) {
