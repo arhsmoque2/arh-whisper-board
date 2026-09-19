@@ -61,6 +61,8 @@ fun rememberPopupUiController(
 }
 
 val ExceptionsForKeyCodes = listOf(
+    KeyCode.DELETE,
+    KeyCode.DELETE_ALL,
     KeyCode.ENTER,
     KeyCode.LANGUAGE_SWITCH,
     KeyCode.IME_UI_MODE_TEXT,

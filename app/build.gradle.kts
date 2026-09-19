@@ -56,6 +56,10 @@ kotlin {
     }
 }
 
+base {
+    archivesName.set("arh-dictate")
+}
+
 configure<ApplicationExtension> {
     namespace = "dev.patrickgold.florisboard"
     compileSdk = projectCompileSdk.toInt()
@@ -110,6 +114,10 @@ configure<ApplicationExtension> {
             // request to download the language resources for a specific locale.
             enableSplit = false
         }
+    }
+
+    androidResources {
+        localeFilters += listOf("en", "zh-rCN", "ms")
     }
 
     buildFeatures {
@@ -268,7 +276,6 @@ dependencies {
     implementation(libs.cache4k)
     // GIF search (Klipy): Compose image loading + animated GIF/WebP decoding + OkHttp network fetcher.
     implementation(libs.coil.compose)
-    implementation(libs.coil.gif)
     implementation(libs.coil.network.okhttp)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.coroutines)

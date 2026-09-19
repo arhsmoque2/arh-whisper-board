@@ -897,9 +897,44 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
      *
      * @return True on success, false if an error occurred or the input connection is invalid.
      */
+    var lastClearedText: String? = null
+        private set
+
+    /**
+     * Clears all text from the active editor, snapshotting the full content to [lastClearedText]
+     * so it can be restored safely via [performUndo] / [restoreLastClearedText].
+     */
+    fun clearAllText(): Boolean {
+        autoSpace.setInactive()
+        phantomSpace.setInactive()
+        val ic = currentInputConnection() ?: return false
+        val before = ic.getTextBeforeCursor(100_000, 0)?.toString() ?: ""
+        val after = ic.getTextAfterCursor(100_000, 0)?.toString() ?: ""
+        val fullText = before + after
+        if (fullText.isEmpty()) return false
+
+        lastClearedText = fullText
+        ic.beginBatchEdit()
+        try {
+            ic.deleteSurroundingText(before.length, after.length)
+        } finally {
+            ic.endBatchEdit()
+        }
+        return true
+    }
+
+    fun restoreLastClearedText(): Boolean {
+        val text = lastClearedText ?: return false
+        lastClearedText = null
+        return commitText(text)
+    }
+
     fun performUndo(): Boolean {
         autoSpace.setInactive()
         phantomSpace.setInactive()
+        if (lastClearedText != null) {
+            return restoreLastClearedText()
+        }
         return sendDownUpKeyEvent(KeyEvent.KEYCODE_Z, meta(ctrl = true))
     }
 

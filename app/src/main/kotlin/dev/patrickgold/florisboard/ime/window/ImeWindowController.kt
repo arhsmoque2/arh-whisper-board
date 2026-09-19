@@ -18,6 +18,7 @@ package dev.patrickgold.florisboard.ime.window
 
 import android.content.res.Configuration
 import android.inputmethodservice.InputMethodService
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.min
@@ -134,12 +135,21 @@ class ImeWindowController(
             )
         }
 
+        val touchCalibrationFlow = combine(
+            prefs.touchCalibration.enabled.asFlow(),
+            prefs.touchCalibration.activeProfilePortrait.asFlow(),
+            prefs.touchCalibration.activeProfileLandscape.asFlow(),
+        ) { enabled, portrait, landscape ->
+            Triple(enabled, portrait, landscape)
+        }
+
         combine(
             activeRootInsets,
             activeWindowConfig,
             userPreferredOptions,
             editor.version,
-        ) { rootInsets, windowConfig, userConfig, _ ->
+            touchCalibrationFlow,
+        ) { rootInsets, windowConfig, userConfig, _, _ ->
             doComputeWindowSpec(rootInsets, windowConfig, userConfig)
         }.collectIn(scope) { windowSpec ->
             activeWindowSpec.value = windowSpec
@@ -265,8 +275,25 @@ class ImeWindowController(
         return when (windowConfig.mode) {
             ImeWindowMode.FIXED -> {
                 val constraints = ImeWindowConstraints.of(rootInsets, windowConfig.fixedMode)
-                val props = (windowConfig.fixedProps[windowConfig.fixedMode] ?: constraints.defaultProps)
-                    .constrained(constraints)
+                var props = (windowConfig.fixedProps[windowConfig.fixedMode] ?: constraints.defaultProps)
+                val calibration = prefs.touchCalibration
+                if (calibration.enabled.get()) {
+                    val rootBounds = rootInsets.boundsDp
+                    val isPortrait = rootBounds.width <= rootBounds.height
+                    val profile = if (isPortrait) {
+                        calibration.activeProfilePortrait.get()
+                    } else {
+                        calibration.activeProfileLandscape.get()
+                    }
+                    if (profile.isEnabled && (profile.paddingLeftDp > 0f || profile.paddingRightDp > 0f || profile.paddingBottomDp > 0f)) {
+                        props = props.copy(
+                            paddingLeft = (props.paddingLeft.value + profile.paddingLeftDp).dp,
+                            paddingRight = (props.paddingRight.value + profile.paddingRightDp).dp,
+                            paddingBottom = (props.paddingBottom.value + profile.paddingBottomDp).dp,
+                        )
+                    }
+                }
+                props = props.constrained(constraints)
                 ImeWindowSpec.Fixed(
                     fixedMode = windowConfig.fixedMode,
                     props = props,

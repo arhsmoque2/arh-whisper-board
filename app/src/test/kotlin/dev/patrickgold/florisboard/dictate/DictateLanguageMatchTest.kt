@@ -29,14 +29,11 @@ class DictateLanguageMatchTest : FunSpec({
     context("matchDevice resolves a plain or regional system locale to its base language") {
         withData(
             nameFn = { "${it.first} -> ${it.second}" },
-            Locale("de") to "de",
-            Locale("de", "DE") to "de",
-            Locale("de", "AT") to "de",
-            Locale("de", "CH") to "de",
-            Locale.GERMANY to "de",
+            Locale("en") to "en",
             Locale("en", "US") to "en",
-            Locale("fr", "FR") to "fr",
-            Locale("pt", "BR") to "pt",
+            Locale("en", "GB") to "en",
+            Locale("ms") to "ms",
+            Locale("ms", "MY") to "ms",
         ) { (locale, expected) ->
             DictateLanguages.matchDevice(locale)?.code shouldBe expected
         }
@@ -55,6 +52,8 @@ class DictateLanguageMatchTest : FunSpec({
     context("matchDevice returns null for unsupported languages and never returns detect") {
         withData(
             nameFn = { "locale=<${it.toLanguageTag()}>" },
+            Locale("de"),
+            Locale("fr"),
             Locale.forLanguageTag("xx"),
             Locale("", ""),
         ) { locale ->
@@ -67,15 +66,15 @@ class DictateLanguageMatchTest : FunSpec({
     // language field takes a list can be told the actual set — but only while nothing is pinned.
     context("expectedLanguages hands the user's selection to a provider that takes a list") {
         test("auto-detect with several languages passes them all, in the selected order") {
-            DictateLanguages.expectedLanguages("detect", "detect,de,en,fr") shouldBe listOf("de", "en", "fr")
+            DictateLanguages.expectedLanguages("detect", "detect,ms,en") shouldBe listOf("ms", "en")
         }
 
         test("a pinned language is never widened") {
-            DictateLanguages.expectedLanguages("de", "detect,de,en,fr") shouldBe emptyList()
+            DictateLanguages.expectedLanguages("ms", "detect,ms,en") shouldBe emptyList()
         }
 
         test("a single language is left to the ordinary one-language hint") {
-            DictateLanguages.expectedLanguages("detect", "detect,de") shouldBe emptyList()
+            DictateLanguages.expectedLanguages("detect", "detect,ms") shouldBe emptyList()
         }
 
         test("no language at all stays free detection") {
@@ -83,11 +82,7 @@ class DictateLanguageMatchTest : FunSpec({
         }
 
         test("a wish list of languages is not an expectation") {
-            val many = DictateLanguages.all.filter { it.code != DictateLanguages.DETECT }.take(9)
-            DictateLanguages.expectedLanguages(
-                "detect",
-                DictateLanguages.serializeSelection(many),
-            ) shouldBe emptyList()
+            DictateLanguages.expectedLanguages("detect", "detect,en,ms,zh-CN,zh-TW,l1,l2,l3") shouldBe emptyList()
         }
 
         test("regional codes lose their region, and two variants of one language count once") {
@@ -97,7 +92,7 @@ class DictateLanguageMatchTest : FunSpec({
         }
 
         test("detect itself is never sent as a language") {
-            DictateLanguages.expectedLanguages("detect", "detect,de,en")
+            DictateLanguages.expectedLanguages("detect", "detect,ms,en")
                 .shouldNotContain(DictateLanguages.DETECT)
         }
     }

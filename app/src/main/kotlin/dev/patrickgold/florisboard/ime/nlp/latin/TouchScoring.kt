@@ -38,6 +38,12 @@ internal object TouchScoring {
      */
     const val TOUCH_SIGMA2 = 0.2
 
+    /**
+     * Active configurable touch variance in key-width², adjusted by calibration profiles.
+     */
+    @Volatile
+    var configuredSigma2: Double = TOUCH_SIGMA2
+
     /** Log-probability prior for a dictionary frequency on the stored 128..255 scale. */
     fun lmPrior(freq: Int): Double = (freq - 128).coerceAtLeast(0) / 127.0 * LM_SPAN
 
@@ -45,6 +51,6 @@ internal object TouchScoring {
      * Full score for a candidate the beam produced: its prior, the tap evidence against it ([cost] is the
      * excess squared distance in key-width²), and the bigram [context] bonus.
      */
-    fun score(freq: Int, cost: Float, context: Double): Double =
-        lmPrior(freq) - cost / (2.0 * TOUCH_SIGMA2) + context
+    fun score(freq: Int, cost: Float, context: Double, sigma2: Double = configuredSigma2): Double =
+        lmPrior(freq) - cost / (2.0 * sigma2) + context
 }

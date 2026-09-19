@@ -31,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.ime.keyboard.FlorisImeSizing
-import dev.patrickgold.florisboard.dictate.gif.GifSearchPanel
 import dev.patrickgold.florisboard.dictate.sticker.StickerSearchPanel
 import dev.patrickgold.florisboard.ime.clipboard.ClipboardSearchPanel
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiRow
@@ -64,7 +63,6 @@ fun TextInputLayout(
     val state by keyboardManager.activeState.collectAsState()
     val evaluator by keyboardManager.activeEvaluator.collectAsState()
     val emojiSearchActive by keyboardManager.emojiSearchQuery.collectAsState()
-    val gifSearchActive by keyboardManager.gifSearchQuery.collectAsState()
     val stickerSearchActive by keyboardManager.stickerSearchQuery.collectAsState()
     val clipboardSearchActive by keyboardManager.clipboardSearchQuery.collectAsState()
 
@@ -76,14 +74,9 @@ fun TextInputLayout(
             .wrapContentHeight(),
     ) {
         // While a search is running (issues #110, #274, #317, #333), its panel takes the Smartbar's slot
-        // so the keyboard layout below stays available for typing the query. All four are taller than
-        // the Smartbar — results above the search bar for emoji, stickers and clips, earlier terms for
-        // GIF — and size themselves, so the keyboard grows for the duration of the search the way the
-        // GIF panel does. Only one can be open at a time: each is reached from its own panel.
+        // so the keyboard layout below stays available for typing the query.
         if (emojiSearchActive != null) {
             EmojiSearchPanel()
-        } else if (gifSearchActive != null) {
-            GifSearchPanel()
         } else if (stickerSearchActive != null) {
             StickerSearchPanel()
         } else if (clipboardSearchActive != null) {

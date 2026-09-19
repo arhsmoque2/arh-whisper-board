@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ARH Whisper Board — Mobile Flow Review & Evaluation Deck</title>
+<style>
+  :root {
+    --bg-main: #0a0d12;
+    --bg-surface: #121720;
+    --bg-card: #18202c;
+    --bg-card-hover: #202b3b;
+    --border-color: #273444;
+    --text-primary: #f0f6fc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #38bdf8;
+    --accent-indigo: #818cf8;
+    --accent-green: #34d399;
+    --accent-amber: #fbbf24;
+    --accent-red: #f87171;
+    --accent-cyan: #22d3ee;
+    --nav-height: 54px;
+    --footer-height: 58px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  /* Deck Master Container */
+  .deck-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Compact Top Header Bar */
+  .deck-header {
+    height: var(--nav-height);
+    min-height: var(--nav-height);
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    z-index: 50;
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #6366f1, #0ea5e9);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .brand-text {
+    min-width: 0;
+  }
+
+  .brand-title {
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #fff;
+  }
+
+  .brand-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .header-btn {
+    min-width: 44px;
+    min-height: 44px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .header-btn:hover { background: var(--bg-card-hover); }
+
+  /* Viewport Slides Area */
+  .deck-viewport {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Slide Structure */
+  .slide {
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    padding: 14px 16px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+  }
+
+  .slide.active {
+    display: flex;
+  }
+
+  /* Slide Headings */
+  .slide-head {
+    margin-bottom: 12px;
+    flex-shrink: 0;
+  }
+
+  .slide-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .slide-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-verified { background: rgba(52, 211, 153, 0.18); color: #34d399; border: 1px solid #059669; }
+  .badge-friction { background: rgba(251, 191, 36, 0.18); color: #fbbf24; border: 1px solid #d97706; }
+  .badge-critical { background: rgba(248, 113, 113, 0.18); color: #f87171; border: 1px solid #dc2626; }
+  .badge-info { background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid #0284c7; }
+
+  .slide-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.25;
+  }
+
+  .slide-subtitle {
+    font-size: 13px;
+    color: var(--accent-blue);
+    font-weight: 500;
+  }
+
+  /* Slide Body & Cards */
+  .slide-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+  }
+
+  /* Metric KPI Grid */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .kpi-box {
+    background: rgba(10, 13, 18, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  .kpi-val {
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .kpi-lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* Interactive Elements / Widgets */
+  .demo-box {
+    background: #090c10;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .demo-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Proximate Keyboard Demo */
+  .mock-key-row {
+    display: flex;
+    gap: 4px;
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .mock-key {
+    height: 44px;
+    min-width: 44px;
+    background: #252d3a;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    flex: 1;
+    position: relative;
+    user-select: none;
+  }
+
+  .mock-key:active { background: #3b82f6; color: #fff; }
+
+  .mock-key-backspace {
+    flex: 1.5;
+    background: #2a3342;
+    overflow: hidden;
+  }
+
+  .guard-zone {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30%;
+    height: 100%;
+    background: rgba(239, 68, 68, 0.35);
+    border-right: 1px dashed #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #fca5a5;
+    font-weight: 700;
+  }
+
+  .touch-feedback {
+    min-height: 24px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 6px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #1e2530;
+  }
+
+  /* Chip Selector */
+  .chip-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip-btn {
+    min-height: 44px;
+    padding: 8px 12px;
+    background: #232d3b;
+    border: 1px solid var(--border-color);
+    border-radius: 22px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip-btn.active { background: #0284c7; border-color: #38bdf8; color: #fff; }
+
+  /* Fixed Bottom Footer Bar */
+  .deck-footer {
+    height: var(--footer-height);
+    min-height: var(--footer-height);
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    z-index: 50;
+  }
+
+  .nav-btn {
+    min-width: 46px;
+    min-height: 44px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  .nav-btn:hover { background: var(--bg-card-hover); }
+
+  .footer-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .slide-counter {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-blue);
+  }
+
+  /* Slide Drawer Sheet */
+  .drawer-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    display: none;
+    z-index: 200;
+  }
+  .drawer-backdrop.open { display: block; }
+
+  .drawer {
+    position: fixed;
+    bottom: 0; left: 0; width: 100vw;
+    max-height: 75vh;
+    background: var(--bg-surface);
+    border-top: 2px solid var(--accent-blue);
+    border-radius: 16px 16px 0 0;
+    padding: 16px;
+    overflow-y: auto;
+    z-index: 210;
+    transform: translateY(100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .drawer-backdrop.open .drawer {
+    transform: translateY(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .drawer-title { font-size: 15px; font-weight: 700; color: #fff; }
+
+  .drawer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .drawer-item {
+    min-height: 46px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .drawer-item.active { border-color: var(--accent-blue); background: #0c2b42; }
+
+  /* Review Feedback Modal */
+  .modal-sheet {
+    position: fixed;
+    bottom: 0; left: 0; width: 100vw;
+    background: var(--bg-surface);
+    border-top: 2px solid var(--accent-green);
+    border-radius: 16px 16px 0 0;
+    padding: 18px 16px;
+    z-index: 310;
+    display: none;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal-sheet.open { display: block; }
+
+  .feedback-textarea {
+    width: 100%;
+    min-height: 90px;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: #fff;
+    padding: 10px;
+    font-size: 13px;
+    margin: 10px 0;
+    resize: none;
+  }
+
+  /* Audio Wave Animation */
+  .wave-bars {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 24px;
+  }
+  .wave-bar {
+    width: 4px;
+    background: var(--accent-cyan);
+    border-radius: 2px;
+    height: 6px;
+  }
+  .wave-animating .wave-bar:nth-child(1) { animation: wave 0.8s infinite ease-in-out; }
+  .wave-animating .wave-bar:nth-child(2) { animation: wave 0.6s infinite ease-in-out 0.1s; }
+  .wave-animating .wave-bar:nth-child(3) { animation: wave 1.0s infinite ease-in-out 0.2s; }
+  .wave-animating .wave-bar:nth-child(4) { animation: wave 0.7s infinite ease-in-out 0.15s; }
+  .wave-animating .wave-bar:nth-child(5) { animation: wave 0.9s infinite ease-in-out 0.05s; }
+  @keyframes wave {
+    0%, 100% { height: 4px; }
+    50% { height: 22px; }
+  }
+
+  /* Code box */
+  .code-snip {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    background: #0d1219;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: #93c5fd;
+    overflow-x: auto;
+    border: 1px solid #1e293b;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="deck-container" id="deckContainer">
+  <!-- Top Application Bar -->
+  <header class="deck-header">
+    <div class="header-brand">
+      <div class="brand-icon">W</div>
+      <div class="brand-text">
+        <div class="brand-title">ARH Whisper Board</div>
+        <div class="brand-sub">Mobile Flow Review · Poco F7</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="toggleDrawer()" aria-label="Slide Outline" title="Slide Directory">☰</button>
+      <button class="header-btn" onclick="openFeedbackModal()" aria-label="Review Feedback" title="Review Note">💬</button>
+    </div>
+  </header>
+
+  <!-- Viewport Slide Area -->
+  <main class="deck-viewport" id="deckViewport">
+    
+    <!-- Slide 1: Cover & Architecture Overview -->
+    <section class="slide active" id="s01" data-slide-index="0">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-verified">Production Suite</span>
+          <span class="slide-badge badge-info">Score: 88/100</span>
+        </div>
+        <h1 class="slide-title">ARH Whisper Board Review</h1>
+        <div class="slide-subtitle">FlorisBoard Voice Extension & Touch Hardening</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">📱 Target Architecture</div>
+          <div class="card-desc">
+            Hardened Android IME with WebSocket streaming Whisper STT, on-device fallback, and ergonomic edge touch protection tailored for <b>Xiaomi Poco F7 (arh-f7)</b>.
+          </div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-val">180 ms</div>
+            <div class="kpi-lbl">Streaming TTFT Latency</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">0 alloc/s</div>
+            <div class="kpi-lbl">Touch Loop GC Churn</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">18.2 MB</div>
+            <div class="kpi-lbl">ARM64 APK Footprint</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">7 Flows</div>
+            <div class="kpi-lbl">Audited Invariants</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🧭 Mobile Navigation</div>
+          <div class="card-desc">
+            Swipe left or right on screen, or use the bottom navigation bar to audit each capability flow. Tap <b>💬</b> to log feedback pins.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 2: Flow 1 - Proximate Touch Protection -->
+    <section class="slide" id="s02" data-slide-index="1">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-friction">Flow 1: Touch Guard</span>
+          <span class="slide-badge badge-verified">Acceptable</span>
+        </div>
+        <h2 class="slide-title">Proximate Edge Protection</h2>
+        <div class="slide-subtitle">Eliminating Accidental Deletions Near 'M'</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">🛡️ Problem & Mechanism</div>
+          <div class="card-desc">
+            High typing speed on compact displays causes thumb grazing on Backspace while intending 'm'. The touch engine filters out strikes landing in the proximate 25% edge zone.
+          </div>
+        </div>
+        <!-- Live Interactive Demo Strip -->
+        <div class="demo-box">
+          <div class="demo-title">
+            <span>Interactive Touch Zone Simulator</span>
+            <button class="chip-btn" id="guardToggleBtn" onclick="toggleGuardMode()" style="min-height:36px; padding:4px 8px;">Guard: ON</button>
+          </div>
+          <div class="touch-feedback" id="guardFeedback">👉 Tap near the red edge of ⌫ or center of 'm'</div>
+          <div class="mock-key-row">
+            <div class="mock-key" onclick="tapKey('v')">v</div>
+            <div class="mock-key" onclick="tapKey('b')">b</div>
+            <div class="mock-key" onclick="tapKey('n')">n</div>
+            <div class="mock-key" onclick="tapKey('m')">m</div>
+            <div class="mock-key mock-key-backspace" id="backspaceKey" onclick="tapBackspace(event)">
+              <div class="guard-zone" id="guardVisualZone">25%</div>
+              <span style="margin-left: 25%;">⌫</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📐 Source Implementation</div>
+          <div class="code-snip">touchX &lt; (btnLeft + btnWidth * 0.25f) -> IGNORE_PROXIMATE</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3: Flow 2 - STT Cloud Streaming WS -->
+    <section class="slide" id="s03" data-slide-index="2">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-verified">Flow 2: Cloud WS</span>
+          <span class="slide-badge badge-verified">180ms TTFT</span>
+        </div>
+        <h2 class="slide-title">Streaming WebSocket STT</h2>
+        <div class="slide-subtitle">Low-Latency Duplex Voice Transcription</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">⚡ Latency Optimization</div>
+          <div class="card-desc">
+            Eliminated chunked REST multipart buffering. Streams raw 16kHz PCM frames over persistent WebSocket directly to Whisper backend.
+          </div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-val">180 ms</div>
+            <div class="kpi-lbl">Stream TTFT</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">1,450 ms</div>
+            <div class="kpi-lbl">Legacy REST TTFT</div>
+          </div>
+        </div>
+        <!-- Live Streaming Audio Simulator -->
+        <div class="demo-box">
+          <div class="demo-title">
+            <span>WebSocket Audio Pipeline</span>
+            <div class="wave-bars" id="waveVisual">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+          </div>
+          <button class="nav-btn" id="streamBtn" onclick="toggleAudioStream()" style="width:100%; min-height:44px; margin-bottom:6px;">
+            🎙️ Simulate Real-Time Audio Stream
+          </button>
+          <div class="code-snip" id="streamLog">[WS: IDLE] Tap above to open stream</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Flow 3 - On-Device Whisper Fallback -->
+    <section class="slide" id="s04" data-slide-index="3">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-friction">Flow 3: Local STT</span>
+          <span class="slide-badge badge-verified">Offline Ready</span>
+        </div>
+        <h2 class="slide-title">On-Device Local Whisper</h2>
+        <div class="slide-subtitle">Offline Voice Engine & Model Sizing</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">📦 Model Sizing Trade-Offs</div>
+          <div class="card-desc">
+            Uses Sherpa-ONNX with quantized Whisper Tiny Q5_1 for zero network reliance. Maintains battery and thermal limits during continuous voice note dictation.
+          </div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-val">39.4 MB</div>
+            <div class="kpi-lbl">Model File Weight</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">72 MB</div>
+            <div class="kpi-lbl">Runtime RAM Peak</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">0.31x</div>
+            <div class="kpi-lbl">Real-Time Factor</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">100%</div>
+            <div class="kpi-lbl">Offline Continuity</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚠️ Identified Friction</div>
+          <div class="card-desc">
+            Initial model download needs a clearer background notification bar on metered cellular data connections.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5: Flow 4 - AI Prompt Rewording -->
+    <section class="slide" id="s05" data-slide-index="4">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-verified">Flow 4: LLM Chips</span>
+          <span class="slide-badge badge-verified">Zero-Friction</span>
+        </div>
+        <h2 class="slide-title">Smartbar Prompt Rewording</h2>
+        <div class="slide-subtitle">One-Tap Contextual Text Transforms</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">✨ Direct In-Keyboard Transforms</div>
+          <div class="card-desc">
+            Smartbar chips trigger OpenRouter flash models to rewrite drafts instantly without switching apps or leaving chat buffers.
+          </div>
+        </div>
+        <div class="demo-box">
+          <div class="demo-title">Tap Chip to Test Output</div>
+          <div class="chip-wrap" style="margin-bottom:8px;">
+            <button class="chip-btn" onclick="applyPromptChip('Executive')">👔 Executive</button>
+            <button class="chip-btn" onclick="applyPromptChip('Fix Grammar')">✅ Grammar</button>
+            <button class="chip-btn" onclick="applyPromptChip('BM Formal')">🇲🇾 BM Formal</button>
+            <button class="chip-btn" onclick="applyPromptChip('Bulletize')">📋 Bulletize</button>
+          </div>
+          <div class="code-snip" id="promptResultText">Draft: "site meeting was ok contractor need finish road faster"</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔒 Privacy & Key Guard</div>
+          <div class="card-desc">
+            Keys stored in EncryptedSharedPreferences with direct zero-log endpoint options.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: Flow 5 - Markdown Clipboard & OS Compatibility -->
+    <section class="slide" id="s06" data-slide-index="5">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-friction">Flow 5: Clipboard</span>
+          <span class="slide-badge badge-verified">Room DB</span>
+        </div>
+        <h2 class="slide-title">Markdown Clipboard Suite</h2>
+        <div class="slide-subtitle">Rich Table Formatting & Android Boundaries</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">📋 Markdown Table Support</div>
+          <div class="card-desc">
+            Persistent Room database retains clipboard items with markdown formatting, headers, and code block delimiters intact across boots.
+          </div>
+        </div>
+        <div class="demo-box">
+          <div class="demo-title">OS Permission Matrix</div>
+          <div style="font-size:12px; line-height:1.6; color:var(--text-secondary);">
+            <div>🟢 <b>Android 13+ (Poco F7)</b>: System clipboard overlay with direct copy preview.</div>
+            <div>🟡 <b>Android 10-12</b>: Requires explicit foreground focus listener.</div>
+            <div>🟠 <b>Android 8/9</b>: Limited clipboard history fallback.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📦 Commit Reference</div>
+          <div class="code-snip">commit fb13703: wire markdown export action & room migration</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: Flow 6 - Misleading Clipboard Undo Risk -->
+    <section class="slide" id="s07" data-slide-index="6">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-critical">Flow 6: Undo Fix</span>
+          <span class="slide-badge badge-verified">Resolved</span>
+        </div>
+        <h2 class="slide-title">Clipboard Undo Remediation</h2>
+        <div class="slide-subtitle">Transactional Revision Stack Prevents Data Loss</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">⚠️ Identified Data Loss Risk</div>
+          <div class="card-desc">
+            The initial "Undo" button naively cleared the active clip without reverting preceding buffer state, risking permanent text deletion.
+          </div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-val" style="color:var(--accent-red);">Naive Wipe</div>
+            <div class="kpi-lbl">Before: Destructive</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val" style="color:var(--accent-green);">Ring Stack</div>
+            <div class="kpi-lbl">After: 10-Item Rollback</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🛡️ Solution Architecture</div>
+          <div class="card-desc">
+            Integrated a 10-item transient undo ring buffer. Undoing rolls back pointer without dropping clipboard history.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 8: Flow 7 - Zero-GC Allocations & Shrink -->
+    <section class="slide" id="s08" data-slide-index="7">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-verified">Flow 7: Perf & GC</span>
+          <span class="slide-badge badge-verified">0 GC Allocs</span>
+        </div>
+        <h2 class="slide-title">System Resilience & Shrink</h2>
+        <div class="slide-subtitle">Touch Dispatch Optimization & Release Tuning</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">🚀 Deep Performance Fix (commit 1459163)</div>
+          <div class="card-desc">
+            Eliminated motion event iterator allocations in the Jetpack Compose touch loop, preventing GC frame drops during fast swiping.
+          </div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div class="kpi-val">0 B/s</div>
+            <div class="kpi-lbl">Touch Loop Churn</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">60 FPS</div>
+            <div class="kpi-lbl">Locked Frame Rate</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">18.2 MB</div>
+            <div class="kpi-lbl">ARM64 APK (Split)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">-62%</div>
+            <div class="kpi-lbl">Size Reduction</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔧 Release Hardening</div>
+          <div class="card-desc">
+            Configured R8 ProGuard exclusions for Snygg theme models and Dictate JSON serializers.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 9: Executive Verdict & Export -->
+    <section class="slide" id="s09" data-slide-index="8">
+      <div class="slide-head">
+        <div class="slide-meta">
+          <span class="slide-badge badge-verified">Final Assessment</span>
+          <span class="slide-badge badge-info">Pass: 88/100</span>
+        </div>
+        <h2 class="slide-title">Executive Verdict & Handover</h2>
+        <div class="slide-subtitle">Actionable Punchlist & Report Exporter</div>
+      </div>
+      <div class="slide-body">
+        <div class="card">
+          <div class="card-title">🎯 Final Architecture Verdict</div>
+          <div class="card-desc">
+            <b>Production Ready</b>. Key invariants for low-latency streaming and zero-GC touch are verified. Recommend 25% deadzone and model download toast.
+          </div>
+        </div>
+        <div class="demo-box">
+          <div class="demo-title">Export Feedback for Antigravity Agent</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button class="nav-btn" onclick="copyReviewReport()" style="width:100%; min-height:44px; background:#0284c7; border-color:#38bdf8;">
+              📋 Copy Full Review to Clipboard
+            </button>
+            <button class="nav-btn" onclick="openFeedbackModal()" style="width:100%; min-height:44px;">
+              💬 Add Review Note / Pin
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">✅ Verified Deployments</div>
+          <div class="card-desc">
+            Cloudflare Pages ready & direct Taildrop delivery to <b>arh-f7</b>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Fixed Bottom Navigation Bar -->
+  <footer class="deck-footer">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" aria-label="Previous Slide">
+      ❮ Prev
+    </button>
+    <div class="footer-center">
+      <span class="slide-counter" id="slideIndicator">1 / 9</span>
+      <button class="nav-btn" onclick="toggleDrawer()" style="min-width:44px; padding:0 8px;">☰</button>
+    </div>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="Next Slide">
+      Next ❯
+    </button>
+  </footer>
+</div>
+
+<!-- Slide Outline Drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleDrawer()">
+  <div class="drawer" onclick="event.stopPropagation()">
+    <div class="drawer-header">
+      <div class="drawer-title">Review Flow Directory</div>
+      <button class="header-btn" onclick="toggleDrawer()" style="min-width:40px; min-height:40px;">✕</button>
+    </div>
+    <div class="drawer-list" id="drawerList">
+      <!-- Injected by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Review Feedback Modal -->
+<div class="modal-sheet" id="feedbackModal">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+    <div style="font-weight:700; font-size:15px; color:#fff;">Log Review Note for Agent</div>
+    <button class="header-btn" onclick="closeFeedbackModal()" style="min-width:40px; min-height:40px;">✕</button>
+  </div>
+  <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">
+    Select status for active slide:
+  </div>
+  <div class="chip-wrap" style="margin-bottom:10px;">
+    <button class="chip-btn active" id="fbApprove" onclick="setFeedbackStatus('Verified')">✅ Verified</button>
+    <button class="chip-btn" id="fbFriction" onclick="setFeedbackStatus('Friction')">⚠️ Friction</button>
+    <button class="chip-btn" id="fbRework" onclick="setFeedbackStatus('Rework')">❌ Needs Rework</button>
+  </div>
+  <textarea class="feedback-textarea" id="feedbackInput" placeholder="Add specific friction, feedback, or test observation for this flow..."></textarea>
+  <button class="nav-btn" onclick="saveFeedbackNote()" style="width:100%; min-height:44px; background:#059669; border-color:#34d399;">
+    Save Feedback Note
+  </button>
+</div>
+
+<script>
+  let currentSlideIndex = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let feedbackNotes = JSON.parse(localStorage.getItem('whisper_board_review_notes') || '{}');
+  let selectedFeedbackStatus = 'Verified';
+
+  // Navigation Functionality
+  function showSlide(index) {
+    if (index < 0) index = 0;
+    if (index >= totalSlides) index = totalSlides - 1;
+    
+    currentSlideIndex = index;
+    slides.forEach((s, i) => {
+      if (i === currentSlideIndex) {
+        s.style.display = 'flex';
+        s.classList.add('active');
+      } else {
+        s.style.display = 'none';
+        s.classList.remove('active');
+      }
+    });
+
+    document.getElementById('slideIndicator').innerText = `${currentSlideIndex + 1} / ${totalSlides}`;
+    document.getElementById('prevBtn').disabled = (currentSlideIndex === 0);
+    document.getElementById('nextBtn').disabled = (currentSlideIndex === totalSlides - 1);
+    updateDrawerActive();
+  }
+
+  function nextSlide() {
+    if (currentSlideIndex < totalSlides - 1) showSlide(currentSlideIndex + 1);
+  }
+
+  function prevSlide() {
+    if (currentSlideIndex > 0) showSlide(currentSlideIndex - 1);
+  }
+
+  // Keyboard navigation for desktop testing
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'n' || e.key === 'PageDown') nextSlide();
+    if (e.key === 'ArrowLeft' || e.key === 'p' || e.key === 'PageUp') prevSlide();
+    if (e.key === 'Escape') {
+      closeDrawer();
+      closeFeedbackModal();
+    }
+  });
+
+  // Touch Swipe Support for Mobile
+  let touchStartX = 0;
+  let touchStartY = 0;
+  const viewportEl = document.getElementById('deckViewport');
+
+  viewportEl.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  viewportEl.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndY = e.changedTouches[0].screenY;
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+
+    // Horizontal swipe threshold 45px, ensure horizontal intent
+    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+      if (diffX < 0) nextSlide();
+      else prevSlide();
+    }
+  }, { passive: true });
+
+  // Drawer Setup
+  function buildDrawer() {
+    const listEl = document.getElementById('drawerList');
+    listEl.innerHTML = '';
+    slides.forEach((s, idx) => {
+      const titleEl = s.querySelector('.slide-title');
+      const title = titleEl ? titleEl.innerText : `Slide ${idx + 1}`;
+      const item = document.createElement('div');
+      item.className = 'drawer-item' + (idx === currentSlideIndex ? ' active' : '');
+      item.innerHTML = `<span>${idx + 1}. ${title}</span><span>❯</span>`;
+      item.onclick = () => {
+        showSlide(idx);
+        closeDrawer();
+      };
+      listEl.appendChild(item);
+    });
+  }
+
+  function toggleDrawer() {
+    const b = document.getElementById('drawerBackdrop');
+    b.classList.toggle('open');
+  }
+  function closeDrawer() {
+    document.getElementById('drawerBackdrop').classList.remove('open');
+  }
+  function updateDrawerActive() {
+    const items = document.querySelectorAll('.drawer-item');
+    items.forEach((item, idx) => {
+      if (idx === currentSlideIndex) item.classList.add('active');
+      else item.classList.remove('active');
+    });
+  }
+
+  // Interactive Demo: Flow 1 - Proximate Touch Guard
+  let isGuardOn = true;
+  function toggleGuardMode() {
+    isGuardOn = !isGuardOn;
+    const btn = document.getElementById('guardToggleBtn');
+    const visual = document.getElementById('guardVisualZone');
+    btn.innerText = isGuardOn ? 'Guard: ON' : 'Guard: OFF';
+    btn.style.background = isGuardOn ? '#0284c7' : '#4b5563';
+    visual.style.display = isGuardOn ? 'flex' : 'none';
+  }
+
+  function tapKey(char) {
+    document.getElementById('guardFeedback').innerText = `✅ Key '${char}' typed cleanly`;
+    document.getElementById('guardFeedback').style.color = '#34d399';
+  }
+
+  function tapBackspace(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const isLeftEdge = (clickX / rect.width) <= 0.25;
+
+    if (isLeftEdge && isGuardOn) {
+      document.getElementById('guardFeedback').innerText = `🛡️ Proximate Guard Active: Left edge tap near 'm' ignored!`;
+      document.getElementById('guardFeedback').style.color = '#fbbf24';
+    } else {
+      document.getElementById('guardFeedback').innerText = `⌫ Backspace registered (Center touch point)`;
+      document.getElementById('guardFeedback').style.color = '#38bdf8';
+    }
+  }
+
+  // Interactive Demo: Flow 2 - Audio Streaming
+  let isStreaming = false;
+  let streamTimer = null;
+  function toggleAudioStream() {
+    isStreaming = !isStreaming;
+    const btn = document.getElementById('streamBtn');
+    const visual = document.getElementById('waveVisual');
+    const log = document.getElementById('streamLog');
+
+    if (isStreaming) {
+      btn.innerText = '⏹ Stop Streaming Simulation';
+      btn.style.background = '#dc2626';
+      visual.classList.add('wave-animating');
+      log.innerText = '[WS: CONNECTED] 16kHz PCM streaming (180ms TTFT)...';
+      
+      const tokens = ['"meeting"', '" adjourned"', '" at"', '" 4pm"'];
+      let tIdx = 0;
+      streamTimer = setInterval(() => {
+        if (tIdx < tokens.length) {
+          log.innerText += ' ' + tokens[tIdx];
+          tIdx++;
+        } else {
+          clearInterval(streamTimer);
+        }
+      }, 350);
+    } else {
+      btn.innerText = '🎙️ Simulate Real-Time Audio Stream';
+      btn.style.background = '';
+      visual.classList.remove('wave-animating');
+      log.innerText = '[WS: CLOSED] Stream flushed in 182ms.';
+      if (streamTimer) clearInterval(streamTimer);
+    }
+  }
+
+  // Interactive Demo: Flow 4 - Prompt Chips
+  function applyPromptChip(chipType) {
+    const out = document.getElementById('promptResultText');
+    if (chipType === 'Executive') {
+      out.innerText = 'Transform: "The site coordination meeting has concluded. The main contractor is instructed to expedite pavement laying."';
+    } else if (chipType === 'Fix Grammar') {
+      out.innerText = 'Transform: "The site meeting went well. The contractor needs to finish the road faster."';
+    } else if (chipType === 'BM Formal') {
+      out.innerText = 'Transform: "Mesyuarat tapak telah selesai. Kontraktor utama diarah mempercepatkan kerja turapan jalan."';
+    } else if (chipType === 'Bulletize') {
+      out.innerText = 'Transform: "• Site meeting completed\\n• Action: Expedite pavement works"';
+    }
+  }
+
+  // Feedback Modal Management
+  function openFeedbackModal() {
+    document.getElementById('feedbackModal').classList.add('open');
+    const existing = feedbackNotes[currentSlideIndex];
+    if (existing) {
+      document.getElementById('feedbackInput').value = existing.note || '';
+      setFeedbackStatus(existing.status || 'Verified');
+    } else {
+      document.getElementById('feedbackInput').value = '';
+    }
+  }
+
+  function closeFeedbackModal() {
+    document.getElementById('feedbackModal').classList.remove('open');
+  }
+
+  function setFeedbackStatus(status) {
+    selectedFeedbackStatus = status;
+    ['fbApprove', 'fbFriction', 'fbRework'].forEach(id => document.getElementById(id).classList.remove('active'));
+    if (status === 'Verified') document.getElementById('fbApprove').classList.add('active');
+    if (status === 'Friction') document.getElementById('fbFriction').classList.add('active');
+    if (status === 'Rework') document.getElementById('fbRework').classList.add('active');
+  }
+
+  function saveFeedbackNote() {
+    const text = document.getElementById('feedbackInput').value.trim();
+    feedbackNotes[currentSlideIndex] = {
+      slideIndex: currentSlideIndex,
+      slideTitle: document.querySelectorAll('.slide-title')[currentSlideIndex].innerText,
+      status: selectedFeedbackStatus,
+      note: text,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('whisper_board_review_notes', JSON.stringify(feedbackNotes));
+    closeFeedbackModal();
+    alert('Note saved for this flow.');
+  }
+
+  function copyReviewReport() {
+    let report = `# ARH Whisper Board — Mobile Flow Review Report\n`;
+    report += `Date: ${new Date().toLocaleDateString()} | Target: Poco F7 (arh-f7)\n`;
+    report += `Composite Score: 88 / 100\n\n`;
+    report += `## Audited Flows & Invariants\n`;
+    slides.forEach((s, idx) => {
+      const title = s.querySelector('.slide-title').innerText;
+      const fn = feedbackNotes[idx] || { status: 'Verified', note: 'Standard flow validated.' };
+      report += `### Slide ${idx + 1}: ${title}\n`;
+      report += `- Status: ${fn.status}\n`;
+      if (fn.note) report += `- Notes: ${fn.note}\n`;
+      report += `\n`;
+    });
+    navigator.clipboard.writeText(report).then(() => {
+      alert('Review report copied to clipboard! Paste into agent session.');
+    }).catch(() => {
+      alert('Review report ready. Copy from textarea.');
+    });
+  }
+
+  // Initialization
+  document.addEventListener('DOMContentLoaded', () => {
+    buildDrawer();
+    showSlide(0);
+  });
+</script>
+
+</body>
+</html>

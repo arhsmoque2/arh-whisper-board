@@ -101,7 +101,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.coil.compose)
-    implementation(libs.coil.gif)
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.kotlin.test.junit5)

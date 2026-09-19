@@ -34,8 +34,6 @@ import dev.patrickgold.florisboard.dictate.DictatePromptsLayout
 import dev.patrickgold.florisboard.dictate.DictateRecordingAnimation
 import dev.patrickgold.florisboard.dictate.DictateReasoningEffort
 import dev.patrickgold.florisboard.dictate.data.mappings.DictateMappings
-import dev.patrickgold.florisboard.dictate.gif.GifContentFilter
-import dev.patrickgold.florisboard.dictate.gif.GifHistory
 import dev.patrickgold.florisboard.dictate.overlay.BubbleAnchors
 import dev.patrickgold.florisboard.dictate.overlay.BubbleApps
 import dev.patrickgold.florisboard.dictate.provider.DictateProxyType
@@ -71,7 +69,9 @@ import dev.patrickgold.florisboard.ime.text.key.KeyCode
 import dev.patrickgold.florisboard.ime.text.key.KeyHintConfiguration
 import dev.patrickgold.florisboard.ime.text.key.KeyHintMode
 import dev.patrickgold.florisboard.ime.text.key.UtilityKeyAction
+import dev.patrickgold.florisboard.ime.text.keyboard.CalibrationCheckpointStack
 import dev.patrickgold.florisboard.ime.text.keyboard.TextKeyData
+import dev.patrickgold.florisboard.ime.text.keyboard.TouchCalibrationProfile
 import dev.patrickgold.florisboard.ime.theme.ThemeMode
 import dev.patrickgold.florisboard.ime.theme.extCoreTheme
 import dev.patrickgold.florisboard.ime.window.ImeWindowConfig
@@ -309,24 +309,6 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         val localFallbackEnabled = boolean(
             key = "dictate__local_fallback_enabled",
             default = false,
-        )
-
-        // Wear OS standalone (#106): when on, the paired watch is allowed to transcribe by itself and
-        // the API key is included in the settings snapshot synced to it (stored private to the watch app).
-        // On by default so the watch keeps working when the phone is out of range; it still tethers
-        // through the phone whenever one is reachable. Turn off to keep the key strictly on the phone
-        // (the watch is then tether-only and can't dictate without the phone).
-        val wearStandaloneEnabled = boolean(
-            key = "dictate__wear_standalone_enabled",
-            default = true,
-        )
-
-        // Wear OS (#106/#130): when on, dictations made from the watch are auto-reworded like on the
-        // phone — tethered dictations are reworded by the phone, standalone ones by the watch itself
-        // (using the synced rewording config + auto-apply prompts). On by default.
-        val wearAutoRewordingEnabled = boolean(
-            key = "dictate__wear_auto_rewording_enabled",
-            default = true,
         )
 
         // --- Network proxy (roadmap 5.6) ---------------------------------------------------------
@@ -1119,34 +1101,6 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
     }
 
-    val gif = Gif()
-    inner class Gif {
-        val enabled = boolean(
-            key = "gif__enabled",
-            default = false,
-        )
-        // Bring-your-own KLIPY API key (see KlipyGifProvider). Empty = GIF search disabled.
-        val klipyApiKey = string(
-            key = "gif__klipy_api_key",
-            default = "",
-        )
-        val contentFilter = enum(
-            key = "gif__content_filter",
-            default = GifContentFilter.HIGH,
-        )
-        // Stable per-install id sent to KLIPY for relevance/localization (generated on first use).
-        val customerId = string(
-            key = "gif__customer_id",
-            default = "",
-        )
-        // Recently searched terms + recently inserted GIFs, for quick re-access.
-        val history = custom(
-            key = "gif__history",
-            default = GifHistory.Empty,
-            serializer = GifHistory.Serializer,
-        )
-    }
-
     val sticker = Sticker()
     inner class Sticker {
         // The folder the user picked, as a SAF tree URI we hold a persisted read permission on.
@@ -1479,6 +1433,10 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "keyboard__popup_enabled",
             default = true,
         )
+        val slashKeyPopups = string(
+            key = "keyboard__slash_key_popups",
+            default = "\\ @ ? & # ~ $ %",
+        )
         val mergeHintPopupsEnabled = boolean(
             key = "keyboard__merge_hint_popups_enabled",
             default = false,
@@ -1623,6 +1581,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         val selectionMetrics = boolean(
             key = "smartbar__selection_metrics",
             default = false,
+        )
+        val quickSnippets = string(
+            key = "smartbar__quick_snippets",
+            default = "/resume\n/usage\n/clear",
+        )
+        val symbolShortcuts = string(
+            key = "smartbar__symbol_shortcuts",
+            default = "/ @ .com .my ? & _ - : ; # ~ !",
         )
     }
 
@@ -1790,6 +1756,33 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         val editorLevel = enum(
             key = "theme__editor_level",
             default = SnyggLevel.ADVANCED,
+        )
+    }
+
+    val touchCalibration = TouchCalibration()
+    inner class TouchCalibration {
+        val enabled = boolean(
+            key = "touch_calibration__enabled",
+            default = true,
+        )
+        val activeProfilePortrait = custom(
+            key = "touch_calibration__active_profile_portrait",
+            default = TouchCalibrationProfile.PocoF7PortraitPreset,
+            serializer = TouchCalibrationProfile.Serializer,
+        )
+        val activeProfileLandscape = custom(
+            key = "touch_calibration__active_profile_landscape",
+            default = TouchCalibrationProfile.Default,
+            serializer = TouchCalibrationProfile.Serializer,
+        )
+        val checkpointStack = custom(
+            key = "touch_calibration__checkpoint_stack",
+            default = CalibrationCheckpointStack(),
+            serializer = CalibrationCheckpointStack.Serializer,
+        )
+        val dynamicVoronoiEnabled = boolean(
+            key = "touch_calibration__dynamic_voronoi_enabled",
+            default = true,
         )
     }
 
