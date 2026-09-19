@@ -40,10 +40,12 @@ class TextKeyboard(
 
     override fun getKeyForPos(pointerX: Float, pointerY: Float): TextKey? {
         var matchedKey: TextKey? = null
-        for (key in keys()) {
-            if (key.touchBounds.contains(pointerX, pointerY)) {
-                matchedKey = key
-                break
+        rowLoop@ for (row in arrangement) {
+            for (key in row) {
+                if (key.touchBounds.contains(pointerX, pointerY)) {
+                    matchedKey = key
+                    break@rowLoop
+                }
             }
         }
         if (matchedKey == null) return null
@@ -64,20 +66,22 @@ class TextKeyboard(
             if (relativeX < keyWidth * 0.25f) {
                 var bestNeighbor: TextKey? = null
                 var minDistanceSq = Float.MAX_VALUE
-                for (other in keys()) {
-                    val otherData = if (other.computedData != TextKeyData.UNSPECIFIED) {
-                        other.computedData
-                    } else {
-                        other.data as? KeyData
-                    }
-                    if (otherData != null && otherData.type == KeyType.CHARACTER && other.touchBounds.right <= matchedKey.touchBounds.left + (keyWidth * 0.15f)) {
-                        val dx = pointerX - other.touchBounds.right
-                        val otherCenterY = (other.touchBounds.top + other.touchBounds.bottom) / 2f
-                        val dy = abs(pointerY - otherCenterY)
-                        val distSq = dx * dx + dy * dy
-                        if (distSq < minDistanceSq) {
-                            minDistanceSq = distSq
-                            bestNeighbor = other
+                for (row in arrangement) {
+                    for (other in row) {
+                        val otherData = if (other.computedData != TextKeyData.UNSPECIFIED) {
+                            other.computedData
+                        } else {
+                            other.data as? KeyData
+                        }
+                        if (otherData != null && otherData.type == KeyType.CHARACTER && other.touchBounds.right <= matchedKey.touchBounds.left + (keyWidth * 0.15f)) {
+                            val dx = pointerX - other.touchBounds.right
+                            val otherCenterY = (other.touchBounds.top + other.touchBounds.bottom) / 2f
+                            val dy = abs(pointerY - otherCenterY)
+                            val distSq = dx * dx + dy * dy
+                            if (distSq < minDistanceSq) {
+                                minDistanceSq = distSq
+                                bestNeighbor = other
+                            }
                         }
                     }
                 }
