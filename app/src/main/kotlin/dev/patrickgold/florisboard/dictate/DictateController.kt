@@ -3421,16 +3421,9 @@ object DictateController {
      */
     fun maybePromptForReview() {
         if (_state.value !is UiState.Idle) return
-        // Credit running out comes first: it is the only nudge that is about to stop the app working,
-        // and asking someone to rate Dictate minutes before it refuses to transcribe is poor timing.
+        // Credit running out comes first: it is the only nudge that is about to stop the app working.
         if (maybeWarnLowCredit()) return
-        val total = prefs.dictate.totalAudioSeconds.get()
-        val kind = when {
-            total > DONATE_THRESHOLD_SECONDS && !prefs.dictate.hasDonated.get() -> PromoKind.DONATE
-            total > RATE_THRESHOLD_SECONDS && total <= DONATE_THRESHOLD_SECONDS && !prefs.dictate.hasRated.get() -> PromoKind.RATE
-            else -> return
-        }
-        _state.value = UiState.Promo(kind)
+        // Rate & donate nudges permanently disabled in ARH Dictate.
     }
 
     /** Below this much Dictate Cloud credit the Smartbar says so, once per depletion. */
@@ -3535,9 +3528,7 @@ object DictateController {
         val kind = (_state.value as? UiState.Promo)?.kind ?: return
         runCatching {
             val intent = when (kind) {
-                PromoKind.RATE -> Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=net.devemperor.dictate"))
-                PromoKind.DONATE -> Intent(Intent.ACTION_VIEW, Uri.parse("https://paypal.me/DevEmperor"))
+                PromoKind.RATE, PromoKind.DONATE -> null
                 PromoKind.CHANGELOG -> Intent(context, FlorisAppActivity::class.java)
                 PromoKind.FLOATING_BUTTON -> Intent(
                     Intent.ACTION_VIEW,
@@ -3558,7 +3549,9 @@ object DictateController {
                     FlorisAppActivity::class.java,
                 ).addCategory(Intent.CATEGORY_BROWSABLE)
             }
-            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            if (intent != null) {
+                context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
         }
         markPromoDone(kind)
         _state.value = UiState.Idle

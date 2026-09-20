@@ -38,9 +38,6 @@ import kotlinx.coroutines.launch
 import org.florisboard.lib.compose.florisDialogScroll
 import org.florisboard.lib.compose.stringRes
 
-/** PayPal donation link, kept in sync with the in-keyboard donate promo (see DictateController). */
-private const val DONATE_URL = "https://paypal.me/DevEmperor"
-
 /**
  * Temporary debug switch to preview the dialog. When true, the dialog is shown on every launch
  * regardless of the version bookkeeping (which never triggers on debug builds, since their version
@@ -49,36 +46,37 @@ private const val DONATE_URL = "https://paypal.me/DevEmperor"
 private const val DEBUG_FORCE_SHOW = false
 
 /**
- * A "What's new" dialog shown once after the app was updated to a new version. It relies on the
- * existing [AppVersionUtils] version bookkeeping: it appears when [AppVersionUtils.shouldShowChangelog]
- * is true (i.e. the user updated rather than freshly installed) and marks the changelog as seen on
- * dismissal so it does not reappear on the next launch.
- *
- * The body lists the notes for every release newer than the version the user last saw (so skipping a
- * few updates still surfaces all changes since the installed version), plus a tappable donation
- * invite and a link to the full online changelog/releases page.
- *
- * Note: for debug/CI builds the version name carries a suffix that [AppVersionUtils] cannot parse, so
- * the dialog only surfaces on proper release builds — matching the upstream behavior. Use
- * [DEBUG_FORCE_SHOW] to preview it during development.
+ * A "What's new" dialog shown once after the app was updated to a new version, or on-demand via
+ * Settings › About › Update Log. It relies on [AppVersionUtils] version bookkeeping when invoked
+ * automatically, or displays the full version history when [forceShow] is true.
  */
 @Composable
-fun ChangelogDialog() {
+fun ChangelogDialog(
+    forceShow: Boolean = false,
+    onDismiss: () -> Unit = {},
+) {
     val context = LocalContext.current
     val prefs by FlorisPreferenceStore
     val scope = rememberCoroutineScope()
 
     var visible by rememberSaveable {
-        mutableStateOf(DEBUG_FORCE_SHOW || AppVersionUtils.shouldShowChangelog(context, prefs))
+        mutableStateOf(forceShow || DEBUG_FORCE_SHOW || AppVersionUtils.shouldShowChangelog(context, prefs))
     }
     if (!visible) return
 
-    val lastSeen = VersionName.fromString(prefs.internal.versionLastChangelog.get())
-    val entries = DictateChangelog.entriesSince(lastSeen)
+    val entries = if (forceShow) {
+        DictateChangelog.entries
+    } else {
+        val lastSeen = VersionName.fromString(prefs.internal.versionLastChangelog.get())
+        DictateChangelog.entriesSince(lastSeen)
+    }
 
     fun markSeenAndClose() {
-        scope.launch { AppVersionUtils.updateVersionLastChangelog(context, prefs) }
+        if (!forceShow) {
+            scope.launch { AppVersionUtils.updateVersionLastChangelog(context, prefs) }
+        }
         visible = false
+        onDismiss()
     }
 
     JetPrefAlertDialog(
@@ -105,16 +103,6 @@ fun ChangelogDialog() {
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(text = stringRes(entry.notes))
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { context.launchUrl(DONATE_URL) }
-                    .padding(vertical = 4.dp),
-                text = stringRes(R.string.changelog__donate),
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium,
-            )
         }
     }
 }

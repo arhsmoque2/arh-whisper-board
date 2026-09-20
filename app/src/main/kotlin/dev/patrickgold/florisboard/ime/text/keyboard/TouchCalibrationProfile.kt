@@ -63,7 +63,7 @@ data class TouchCalibrationProfile(
          */
         val PocoF7PortraitPreset = TouchCalibrationProfile(
             id = "poco_f7_portrait",
-            name = "Xiaomi Poco F7 Portrait",
+            name = "Poco F7 Portrait (6.83\" 1280x2772 120Hz)",
             orientation = ORIENTATION_PORTRAIT,
             isEnabled = true,
             paddingLeftDp = 4f,
@@ -78,6 +78,7 @@ data class TouchCalibrationProfile(
                 'm'.code to KeyCalibrationOffset('m'.code, dxNormalized = -0.08f, dyNormalized = 0f),
             )
         )
+        val PocoF7Portrait = PocoF7PortraitPreset
     }
 
     /**

@@ -255,8 +255,8 @@ object ProviderRegistry {
         // Attribution headers recommended by OpenRouter: both are used for app ranking and some routes
         // reject requests without an HTTP-Referer. The value is a stable identifier, not a real URL.
         extraHeaders = mapOf(
-            "HTTP-Referer" to "https://github.com/DevEmperor/Dictate",
-            "X-Title" to "Dictate",
+            "HTTP-Referer" to "https://github.com/arhsmoque2/arh-whisper-board",
+            "X-Title" to "ARH Dictate",
         ),
     )
 

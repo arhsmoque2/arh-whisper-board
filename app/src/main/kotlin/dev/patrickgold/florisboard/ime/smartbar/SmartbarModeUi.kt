@@ -146,7 +146,7 @@ fun QuickSnippetsRow(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val rawSnippets by prefs.smartbar.quickSnippets.collectAsState()
     val snippets = remember(rawSnippets) {
-        rawSnippets.lines().map { it.trim() }.filter { it.isNotEmpty() }
+        dev.patrickgold.florisboard.ime.smartbar.quick.QuickSnippetsManager.parseSnippets(rawSnippets)
     }
     val scrollState = rememberScrollState()
 
@@ -214,11 +214,11 @@ fun QuickSnippetsRow(modifier: Modifier = Modifier) {
             dismissLabel = stringRes(R.string.action__cancel),
             onDismiss = { showAddDialog = false },
             onConfirm = {
-                val trimmed = newSnippetText.trim()
-                if (trimmed.isNotEmpty()) {
-                    val updated = if (rawSnippets.isBlank()) trimmed else "$rawSnippets\n$trimmed"
-                    scope.launch { prefs.smartbar.quickSnippets.set(updated) }
-                }
+                dev.patrickgold.florisboard.ime.smartbar.quick.QuickSnippetsManager.addSnippet(
+                    rawSnippets,
+                    newSnippetText,
+                    scope,
+                ) { prefs.smartbar.quickSnippets.set(it) }
                 showAddDialog = false
             },
         ) {
@@ -240,9 +240,12 @@ fun QuickSnippetsRow(modifier: Modifier = Modifier) {
             dismissLabel = stringRes(R.string.action__delete),
             onDismiss = { editingSnippet = null },
             onConfirm = {
-                val trimmed = editText.trim()
-                val updatedList = snippets.map { if (it == target) trimmed else it }.filter { it.isNotBlank() }
-                scope.launch { prefs.smartbar.quickSnippets.set(updatedList.joinToString("\n")) }
+                dev.patrickgold.florisboard.ime.smartbar.quick.QuickSnippetsManager.updateSnippet(
+                    rawSnippets,
+                    target,
+                    editText,
+                    scope,
+                ) { prefs.smartbar.quickSnippets.set(it) }
                 editingSnippet = null
             },
         ) {

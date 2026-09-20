@@ -17,7 +17,7 @@ This document serves as the immutable as-built record of the platform. All claim
 | 2 | `touch_calibration_wizard` | `touch_engine` | 🟢 Verified | [`TouchCalibrationScreen.kt`](app/src/main/kotlin/dev/patrickgold/florisboard/app/settings/typing/TouchCalibrationScreen.kt) |
 | 3 | `touch_beam_decoder` | `nlp_decoder` | 🟢 Verified | [`TouchBeamDecoder.kt`](app/src/main/kotlin/dev/patrickgold/florisboard/ime/nlp/latin/TouchBeamDecoder.kt) |
 | 4 | `stt_cloud_streaming_websocket` | `voice_ai` | 🟢 Verified | [`RealtimeClient.kt`](lib/dictate-core/src/main/kotlin/dev/patrickgold/florisboard/dictate/provider/RealtimeClient.kt) |
-| 5 | `stt_on_device_whisper` | `voice_ai` | 🟢 Verified | [`local_whisper.py`](worker/arh_dictate/asr/local_whisper.py) / sherpa-onnx |
+| 5 | `stt_on_device_whisper` | `voice_ai` | 🟢 Verified | [`LocalTranscriptionProvider.kt`](app/src/main/kotlin/dev/patrickgold/florisboard/dictate/provider/LocalTranscriptionProvider.kt) / sherpa-onnx |
 | 6 | `ai_prompt_rewording` | `voice_ai` | 🟢 Verified | [`DictateRewording.kt`](lib/dictate-core/src/main/kotlin/dev/patrickgold/florisboard/dictate/provider/DictateRewording.kt) |
 | 7 | `markdown_clipboard_history` | `clipboard` | 🟢 Verified | [`ClipboardDatabase.kt`](app/src/main/kotlin/dev/patrickgold/florisboard/ime/clipboard/ClipboardDatabase.kt) |
 | 8 | `transactional_clipboard_undo` | `clipboard` | 🟢 Verified | [`ClipboardHistoryDao.kt`](app/src/main/kotlin/dev/patrickgold/florisboard/ime/clipboard/ClipboardHistoryDao.kt) |

@@ -38,6 +38,16 @@ jobs:
           chmod +x tools/fetch-sherpa-onnx.sh
           ./tools/fetch-sherpa-onnx.sh
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Whisper Doctor & Invariant Gates
+        run: |
+          python tools/whisper_doctor.py
+          python scripts/ci_asbuilt_doctor.py
+
       - name: Run Unit Tests (Touch Filter & Markdown Exporter)
         run: ./gradlew testDebugUnitTest --continue
 
@@ -46,6 +56,12 @@ jobs:
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: arh-whisper-board-debug
+          path: app/build/outputs/apk/debug/*.apk
 
       - name: Upload Test Reports
         if: always()
