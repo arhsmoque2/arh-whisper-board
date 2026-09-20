@@ -193,19 +193,22 @@ fun TouchCalibrationScreen() = FlorisScreen {
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(
+                                modifier = Modifier.weight(1f),
                                 onClick = {
                                     coroutineScope.launch {
                                         appPrefs.touchCalibration.activeProfilePortrait.set(TouchCalibrationProfile.PocoF7PortraitPreset)
+                                        appPrefs.touchCalibration.activeProfileLandscape.set(TouchCalibrationProfile.PocoF7LandscapePreset)
                                     }
                                     KeyProximityInfo.activeProfile = TouchCalibrationProfile.PocoF7PortraitPreset
                                 }
                             ) {
-                                Text("Load Poco F7 Preset")
+                                Text("Load Poco F7 Presets", maxLines = 1)
                             }
 
                             Button(
+                                modifier = Modifier.weight(1f),
                                 onClick = {
                                     drillIndex = 0
                                     drillInputText = ""
@@ -213,7 +216,7 @@ fun TouchCalibrationScreen() = FlorisScreen {
                                     currentStep = CalibrationWizardStep.DRILL
                                 }
                             ) {
-                                Text("Start Guided Drill →")
+                                Text("Start Guided Drill →", maxLines = 1)
                             }
                         }
                     }
