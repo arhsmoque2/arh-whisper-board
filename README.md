@@ -52,14 +52,14 @@ All 12 native capabilities are contractually defined in [`capabilities.json`](fi
 | 2 | `touch_calibration_wizard` | `touch_engine` | 🟢 Verified | [`TouchCalibrationScreen.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/app/settings/typing/TouchCalibrationScreen.kt#L1-L250) |
 | 3 | `touch_beam_decoder` | `nlp_decoder` | 🟢 Verified | [`TouchBeamDecoder.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/ime/nlp/latin/TouchBeamDecoder.kt#L1-L100) |
 | 4 | `stt_cloud_streaming_websocket` | `voice_ai` | 🟢 Verified | [`RealtimeClient.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/lib/dictate-core/src/main/kotlin/dev/patrickgold/florisboard/dictate/provider/RealtimeClient.kt) |
-| 5 | `stt_on_device_whisper` | `voice_ai` | 🟢 Verified | [`local_whisper.py`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/worker/arh_dictate/asr/local_whisper.py) / Sherpa-ONNX |
+| 5 | `stt_on_device_whisper` | `voice_ai` | 🟢 Verified | [`LocalTranscriptionProvider.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/dictate/provider/LocalTranscriptionProvider.kt) / Sherpa-ONNX |
 | 6 | `ai_prompt_rewording` | `voice_ai` | 🟢 Verified | [`DictateRewording.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/lib/dictate-core/src/main/kotlin/dev/patrickgold/florisboard/dictate/provider/DictateRewording.kt) |
 | 7 | `markdown_clipboard_history` | `clipboard` | 🟢 Verified | [`ClipboardDatabase.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/ime/clipboard/ClipboardDatabase.kt) |
 | 8 | `transactional_clipboard_undo` | `clipboard` | 🟢 Verified | [`ClipboardHistoryDao.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/ime/clipboard/ClipboardHistoryDao.kt) |
 | 9 | `zero_gc_touch_dispatch` | `performance` | 🟢 Verified | [`TextKeyboardLayout.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/ime/text/keyboard/TextKeyboardLayout.kt) |
 | 10 | `snygg_theme_engine` | `ui_engine` | 🟢 Verified | [`SnyggStylesheet.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/lib/snygg/src/main/kotlin/org/florisboard/lib/snygg/SnyggStylesheet.kt) |
 | 11 | `floris_smartbar` | `ui_engine` | 🟢 Verified | [`SmartbarView.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/ime/smartbar/SmartbarView.kt) |
-| 12 | `glide_typing_classifier` | `nlp_decoder` | 🟢 Verified | [`GlideTypingManager.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/ime/text/gestures/GlideTypingManager.kt) |
+| 12 | `custom_quick_text_snippets` | `productivity` | 🟢 Verified | [`QuickSnippetsManager.kt`](file:///D:/_ARH-AGENT-OS/projects/arh-whisper-board/app/src/main/kotlin/dev/patrickgold/florisboard/ime/smartbar/quick/QuickSnippetsManager.kt) |
 
 ---
 
