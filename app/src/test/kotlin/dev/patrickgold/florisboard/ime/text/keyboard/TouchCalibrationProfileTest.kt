@@ -61,6 +61,28 @@ class TouchCalibrationProfileTest {
     }
 
     @Test
+    fun `preset for poco f7 landscape has correct ergonomic offsets and margins`() {
+        val preset = TouchCalibrationProfile.PocoF7LandscapePreset
+        assertEquals("poco_f7_landscape", preset.id)
+        assertEquals(TouchCalibrationProfile.ORIENTATION_LANDSCAPE, preset.orientation)
+        assertTrue(preset.isEnabled)
+        assertEquals(64f, preset.paddingLeftDp)
+        assertEquals(64f, preset.paddingRightDp)
+        assertEquals(8f, preset.paddingBottomDp)
+        assertEquals(0.20, preset.sigma2)
+
+        // Verify inward shift on center keys for thumb reach
+        val (dxG, _) = preset.getOffset('g'.code)
+        assertEquals(-0.10f, dxG)
+
+        val (dxH, _) = preset.getOffset('h'.code)
+        assertEquals(0.10f, dxH)
+
+        val (dxB, _) = preset.getOffset('b'.code)
+        assertEquals(-0.08f, dxB)
+    }
+
+    @Test
     fun `serialization and deserialization roundtrip preserves profile fidelity`() {
         val original = TouchCalibrationProfile.PocoF7PortraitPreset
         val serialized = TouchCalibrationProfile.Serializer.serialize(original)

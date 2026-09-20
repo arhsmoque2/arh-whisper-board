@@ -79,6 +79,32 @@ data class TouchCalibrationProfile(
             )
         )
         val PocoF7Portrait = PocoF7PortraitPreset
+
+        /**
+         * Preset profile for Poco F7 landscape mode (6.83" 2772x1280, 853 dp width).
+         * Adds lateral inset padding (64 dp left/right) and bottom margin (8 dp)
+         * to condense the wide 853 dp canvas into a comfortable two-thumb reach zone,
+         * with inward centroid shifts on center keys (G, H, B, V, T, Y) to eliminate stretch strain.
+         */
+        val PocoF7LandscapePreset = TouchCalibrationProfile(
+            id = "poco_f7_landscape",
+            name = "Poco F7 Landscape (6.83\" 2772x1280 120Hz)",
+            orientation = ORIENTATION_LANDSCAPE,
+            isEnabled = true,
+            paddingLeftDp = 64f,
+            paddingRightDp = 64f,
+            paddingBottomDp = 8f,
+            sigma2 = 0.20,
+            keyOffsets = mapOf(
+                'g'.code to KeyCalibrationOffset('g'.code, dxNormalized = -0.10f, dyNormalized = 0f),
+                'h'.code to KeyCalibrationOffset('h'.code, dxNormalized = 0.10f, dyNormalized = 0f),
+                'b'.code to KeyCalibrationOffset('b'.code, dxNormalized = -0.08f, dyNormalized = 0f),
+                'v'.code to KeyCalibrationOffset('v'.code, dxNormalized = -0.06f, dyNormalized = 0f),
+                't'.code to KeyCalibrationOffset('t'.code, dxNormalized = -0.08f, dyNormalized = 0f),
+                'y'.code to KeyCalibrationOffset('y'.code, dxNormalized = 0.08f, dyNormalized = 0f),
+            )
+        )
+        val PocoF7Landscape = PocoF7LandscapePreset
     }
 
     /**

@@ -1772,7 +1772,7 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
         val activeProfileLandscape = custom(
             key = "touch_calibration__active_profile_landscape",
-            default = TouchCalibrationProfile.Default,
+            default = TouchCalibrationProfile.PocoF7LandscapePreset,
             serializer = TouchCalibrationProfile.Serializer,
         )
         val checkpointStack = custom(
